@@ -1,41 +1,49 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { s3Upload } = require('../config/s3');
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+// Check if S3 is configured
+const isS3Configured = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY;
 
-// Configure storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    let uploadPath = uploadsDir;
-    
-    // Organize files by type
-    if (file.fieldname === 'photo') {
-      uploadPath = path.join(uploadsDir, 'photos');
-    } else if (file.fieldname === 'document' || file.fieldname === 'birthCertificate' || file.fieldname === 'idProof') {
-      uploadPath = path.join(uploadsDir, 'documents');
-    } else if (file.fieldname === 'logo') {
-      uploadPath = path.join(uploadsDir, 'branding');
-    } else if (file.fieldname === 'profileImage') {
-      uploadPath = path.join(uploadsDir, 'profiles');
-    }
-    
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+// Local storage configuration (fallback)
+const localStorageConfig = () => {
+  // Ensure uploads directory exists
+  const uploadsDir = path.join(__dirname, '../uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
   }
-});
+
+  return multer.diskStorage({
+    destination: (req, file, cb) => {
+      let uploadPath = uploadsDir;
+      
+      // Organize files by type
+      if (file.fieldname === 'photo') {
+        uploadPath = path.join(uploadsDir, 'photos');
+      } else if (file.fieldname === 'document' || file.fieldname === 'birthCertificate' || file.fieldname === 'idProof') {
+        uploadPath = path.join(uploadsDir, 'documents');
+      } else if (file.fieldname === 'logo') {
+        uploadPath = path.join(uploadsDir, 'branding');
+      } else if (file.fieldname === 'profileImage') {
+        uploadPath = path.join(uploadsDir, 'profiles');
+      } else if (file.fieldname === 'photos') {
+        uploadPath = path.join(uploadsDir, 'gallery/photos');
+      }
+      
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      
+      cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const ext = path.extname(file.originalname);
+      cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+    }
+  });
+};
 
 // File filter
 const fileFilter = (req, file, cb) => {
@@ -50,9 +58,9 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer
-const upload = multer({
-  storage: storage,
+// Configure multer based on environment
+const upload = isS3Configured ? s3Upload : multer({
+  storage: localStorageConfig(),
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB limit
   },
@@ -92,11 +100,13 @@ const handleUploadError = (err, req, res, next) => {
 };
 
 module.exports = {
+  upload,
   uploadPhoto,
   uploadDocument,
   uploadLogo,
   uploadProfileImage,
   uploadMultiplePhotos,
   uploadStudentFiles,
-  handleUploadError
+  handleUploadError,
+  isS3Configured
 }; 

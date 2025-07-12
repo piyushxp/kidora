@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const Photo = require('../models/Photo');
 const { auth, requireTeacher, requireAnyRole } = require('../middleware/auth');
-const { uploadMultiplePhotos, handleUploadError } = require('../middleware/upload');
+const { uploadMultiplePhotos, handleUploadError, isS3Configured } = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -40,10 +40,14 @@ router.post('/photos', [
 
     // Create photo records for each uploaded file
     for (const file of req.files) {
+      const imageUrl = isS3Configured 
+        ? file.location 
+        : `/uploads/photos/${file.filename}`;
+
       const photo = new Photo({
         title: `${title} - ${file.originalname}`,
         caption,
-        imageUrl: `/uploads/photos/${file.filename}`,
+        imageUrl,
         className,
         date: new Date(date),
         uploadedBy: req.user._id,

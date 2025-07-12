@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
 import {
   HomeIcon,
   UsersIcon,
@@ -14,14 +13,11 @@ import {
   Bars3Icon,
   XMarkIcon,
   BellIcon,
-  ChevronRightIcon,
-  SunIcon,
-  MoonIcon
+  ChevronRightIcon
 } from '@heroicons/react/24/outline';
 
 const Layout = () => {
   const { user, logout, brandSettings } = useAuth();
-  const { isDarkMode, toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,25 +52,25 @@ const Layout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen bg-gray-50 transition-colors">
       {/* Mobile sidebar overlay */}
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div 
-          className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity dark:bg-gray-800/50" 
+          className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" 
           onClick={() => setSidebarOpen(false)} 
         />
         
         {/* Mobile sidebar */}
-        <div className="fixed inset-y-0 left-0 flex w-72 flex-col bg-white dark:bg-gray-800 shadow-2xl transform transition-transform">
+        <div className="fixed inset-y-0 left-0 flex w-72 flex-col bg-white shadow-2xl transform transition-transform">
           {/* Mobile sidebar header */}
-          <div className="flex h-16 items-center justify-between px-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-primary">
+          <div className="flex h-16 items-center justify-between px-6 border-b border-gray-100 bg-gradient-primary">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                 <HomeIcon className="w-4 h-4 text-white" />
               </div>
               <div>
                 <h1 className="text-lg font-semibold text-white">
-                  {brandSettings?.schoolName || 'Playschool Manager'}
+                  {brandSettings?.schoolName || null}
                 </h1>
                 {brandSettings?.tagline && (
                   <p className="text-xs text-white/80">{brandSettings.tagline}</p>
@@ -90,32 +86,32 @@ const Layout = () => {
           </div>
           
           {/* Mobile navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto bg-white dark:bg-gray-800">
+          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto bg-white">
             {navigation.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
                 className={`group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                   isActive(item.href)
-                    ? 'nav-link-active bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 shadow-sm'
-                    : 'nav-link-inactive hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                    ? 'nav-link-active bg-primary-50 text-primary-700 shadow-sm'
+                    : 'nav-link-inactive hover:bg-gray-50 text-gray-700'
                 }`}
                 onClick={() => setSidebarOpen(false)}
               >
                 <item.icon className="icon-sm mr-3 text-current" />
                 <div className="flex-1">
                   <div className="font-medium">{item.name}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.description}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{item.description}</div>
                 </div>
                 {isActive(item.href) && (
-                  <ChevronRightIcon className="icon-xs text-primary-500 dark:text-primary-400" />
+                  <ChevronRightIcon className="icon-xs text-primary-500" />
                 )}
               </a>
             ))}
           </nav>
           
           {/* Mobile user info */}
-          <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+          <div className="p-4 border-t border-gray-100 bg-gray-50">
             <div className="flex items-center space-x-3 mb-3">
               <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center shadow-soft">
                 <span className="text-sm font-semibold text-white">
@@ -123,8 +119,8 @@ const Layout = () => {
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{user?.name}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role?.replace('_', ' ')}</p>
+                <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+                <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
               </div>
             </div>
             <button
@@ -139,9 +135,9 @@ const Layout = () => {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-soft">
+        <div className="flex flex-col flex-grow bg-white border-r border-gray-200 shadow-soft">
           {/* Desktop sidebar header */}
-          <div className="flex h-16 items-center px-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-primary">
+          <div className="flex h-16 items-center px-6 border-b border-gray-100 bg-gradient-primary">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                 <HomeIcon className="w-4 h-4 text-white" />
@@ -158,31 +154,31 @@ const Layout = () => {
           </div>
           
           {/* Desktop navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto bg-white dark:bg-gray-800">
+          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto bg-white">
             {navigation.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
                 className={`group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                   isActive(item.href)
-                    ? 'nav-link-active bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 shadow-sm'
-                    : 'nav-link-inactive hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                    ? 'nav-link-active bg-primary-50 text-primary-700 shadow-sm'
+                    : 'nav-link-inactive hover:bg-gray-50 text-gray-700'
                 }`}
               >
                 <item.icon className="icon-sm mr-3 text-current" />
                 <div className="flex-1">
                   <div className="font-medium">{item.name}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.description}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{item.description}</div>
                 </div>
                 {isActive(item.href) && (
-                  <ChevronRightIcon className="icon-xs text-primary-500 dark:text-primary-400" />
+                  <ChevronRightIcon className="icon-xs text-primary-500" />
                 )}
               </a>
             ))}
           </nav>
           
           {/* Desktop user info */}
-          <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+          <div className="p-4 border-t border-gray-100 bg-gray-50">
             <div className="flex items-center space-x-3 mb-3">
               <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center shadow-soft">
                 <span className="text-sm font-semibold text-white">
@@ -190,8 +186,8 @@ const Layout = () => {
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{user?.name}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role?.replace('_', ' ')}</p>
+                <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+                <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
               </div>
             </div>
             <button
@@ -207,10 +203,10 @@ const Layout = () => {
       {/* Main content */}
       <div className="lg:pl-72">
         {/* Top bar */}
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white/95 backdrop-blur-sm px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
           <button
             type="button"
-            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors lg:hidden"
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors lg:hidden"
             onClick={() => setSidebarOpen(true)}
           >
             <Bars3Icon className="icon-md" />
@@ -219,20 +215,7 @@ const Layout = () => {
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1" />
             <div className="flex items-center gap-x-4 lg:gap-x-6">
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
-                {isDarkMode ? (
-                  <SunIcon className="icon-md" />
-                ) : (
-                  <MoonIcon className="icon-md" />
-                )}
-              </button>
-
-              <button className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors relative">
+              <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors relative">
                 <BellIcon className="icon-md" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-danger-500 rounded-full"></span>
               </button>
@@ -246,13 +229,13 @@ const Layout = () => {
                     </span>
                   </div>
                   <div className="hidden lg:block">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role?.replace('_', ' ')}</p>
+                    <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                    <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
                   </div>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="text-sm text-gray-500 hover:text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   Sign Out
                 </button>
@@ -262,7 +245,7 @@ const Layout = () => {
         </div>
 
         {/* Page content */}
-        <main className="py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <main className="py-8 bg-gray-50 min-h-screen">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <Outlet />
           </div>

@@ -155,8 +155,8 @@ const Settings = () => {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-2 text-base text-gray-600">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Settings</h1>
+        <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
           Manage your account and application settings
         </p>
       </div>
@@ -174,8 +174,8 @@ const Settings = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === tab.id
-                      ? 'border-primary-500 text-primary-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   <tab.icon className="icon-sm inline mr-2" />
@@ -194,66 +194,66 @@ const Settings = () => {
           <>
             <div className="card-header">
               <div className="flex items-center">
-                <UserIcon className="icon-md text-gray-600 mr-3" />
-                <h3 className="text-lg font-semibold text-gray-900">Profile Information</h3>
+                <UserIcon className="icon-md text-gray-600 dark:text-gray-400 mr-3" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Profile Information</h3>
               </div>
             </div>
             <div className="card-body">
               <form onSubmit={handleProfileSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <label className="form-label">Full Name</label>
                     <input
                       type="text"
                       value={profileData.name}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
-                      className="form-input"
+                      onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                      className="form-input bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                       required
                     />
                   </div>
-                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <label className="form-label">Phone Number</label>
                     <input
                       type="tel"
                       value={profileData.phone}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                      className="form-input"
+                      onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                      className="form-input bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                     />
                   </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                    <input
-                      type="email"
-                      value={user?.email || ''}
-                      className="form-input bg-gray-50"
-                      disabled
-                    />
-                    <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                </div>
+                <div>
+                  <label className="form-label">Email</label>
+                  <input
+                    type="email"
+                    value={user?.email || ''}
+                    className="form-input bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400"
+                    disabled
+                  />
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Email cannot be changed
+                  </p>
+                </div>
+                <div>
+                  <label className="form-label">Role</label>
+                  <div className="flex items-center">
                     <span className="badge badge-primary capitalize">
                       {user?.role?.replace('_', ' ')}
                     </span>
                   </div>
                 </div>
-                
                 <div className="flex justify-end">
                   <button
                     type="submit"
                     disabled={saving}
-                    className="btn btn-primary disabled:opacity-50"
+                    className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? (
-                      <>
-                        <LoadingSpinner size="sm" className="mr-2" />
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
                         Saving...
-                      </>
+                      </div>
                     ) : (
-                      'Save Changes'
+                      'Save Profile'
                     )}
                   </button>
                 </div>
@@ -267,101 +267,87 @@ const Settings = () => {
           <>
             <div className="card-header">
               <div className="flex items-center">
-                <KeyIcon className="icon-md text-gray-600 mr-3" />
-                <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
+                <KeyIcon className="icon-md text-gray-600 dark:text-gray-400 mr-3" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Change Password</h3>
               </div>
             </div>
             <div className="card-body">
               <form onSubmit={handlePasswordSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
-                    <div className="relative">
-                      <input
-                        type={showPasswords.current ? 'text' : 'password'}
-                        value={passwordData.currentPassword}
-                        onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                        className="form-input pr-10"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPasswords(prev => ({ ...prev, current: !prev.current }))}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      >
-                        {showPasswords.current ? (
-                          <EyeSlashIcon className="icon-sm text-gray-400" />
-                        ) : (
-                          <EyeIcon className="icon-sm text-gray-400" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-                    <div className="relative">
-                      <input
-                        type={showPasswords.new ? 'text' : 'password'}
-                        value={passwordData.newPassword}
-                        onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                        className="form-input pr-10"
-                        required
-                        minLength={6}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      >
-                        {showPasswords.new ? (
-                          <EyeSlashIcon className="icon-sm text-gray-400" />
-                        ) : (
-                          <EyeIcon className="icon-sm text-gray-400" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-                    <div className="relative">
-                      <input
-                        type={showPasswords.confirm ? 'text' : 'password'}
-                        value={passwordData.confirmPassword}
-                        onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        className="form-input pr-10"
-                        required
-                        minLength={6}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      >
-                        {showPasswords.confirm ? (
-                          <EyeSlashIcon className="icon-sm text-gray-400" />
-                        ) : (
-                          <EyeIcon className="icon-sm text-gray-400" />
-                        )}
-                      </button>
-                    </div>
+                <div>
+                  <label className="form-label">Current Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPasswords.current ? 'text' : 'password'}
+                      value={passwordData.currentPassword}
+                      onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                      className="form-input pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswords({...showPasswords, current: !showPasswords.current})}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      {showPasswords.current ? <EyeSlashIcon className="icon-sm" /> : <EyeIcon className="icon-sm" />}
+                    </button>
                   </div>
                 </div>
-                
+                <div>
+                  <label className="form-label">New Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPasswords.new ? 'text' : 'password'}
+                      value={passwordData.newPassword}
+                      onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                      className="form-input pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswords({...showPasswords, new: !showPasswords.new})}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      {showPasswords.new ? <EyeSlashIcon className="icon-sm" /> : <EyeIcon className="icon-sm" />}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="form-label">Confirm New Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPasswords.confirm ? 'text' : 'password'}
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                      className="form-input pr-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswords({...showPasswords, confirm: !showPasswords.confirm})}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      {showPasswords.confirm ? <EyeSlashIcon className="icon-sm" /> : <EyeIcon className="icon-sm" />}
+                    </button>
+                  </div>
+                </div>
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                    <strong>Password Requirements:</strong> At least 6 characters long
+                  </p>
+                </div>
                 <div className="flex justify-end">
                   <button
                     type="submit"
                     disabled={saving}
-                    className="btn btn-primary disabled:opacity-50"
+                    className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? (
-                      <>
-                        <LoadingSpinner size="sm" className="mr-2" />
-                        Changing...
-                      </>
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                        Updating...
+                      </div>
                     ) : (
-                      'Change Password'
+                      'Update Password'
                     )}
                   </button>
                 </div>
@@ -370,118 +356,111 @@ const Settings = () => {
           </>
         )}
 
-        {/* Brand Settings Tab */}
+        {/* Branding Tab */}
         {activeTab === 'branding' && user?.role === 'super_admin' && (
           <>
             <div className="card-header">
               <div className="flex items-center">
-                <PaintBrushIcon className="icon-md text-gray-600 mr-3" />
-                <h3 className="text-lg font-semibold text-gray-900">Brand Settings</h3>
+                <PaintBrushIcon className="icon-md text-gray-600 dark:text-gray-400 mr-3" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Brand Settings</h3>
               </div>
             </div>
             <div className="card-body">
               <form onSubmit={handleBrandSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">School Name</label>
+                    <label className="form-label">School Name</label>
                     <input
                       type="text"
                       value={brandData.schoolName}
-                      onChange={(e) => setBrandData(prev => ({ ...prev, schoolName: e.target.value }))}
-                      className="form-input"
+                      onChange={(e) => setBrandData({...brandData, schoolName: e.target.value})}
+                      className="form-input bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                       required
                     />
                   </div>
-                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Tagline</label>
+                    <label className="form-label">Tagline</label>
                     <input
                       type="text"
                       value={brandData.tagline}
-                      onChange={(e) => setBrandData(prev => ({ ...prev, tagline: e.target.value }))}
-                      className="form-input"
-                      placeholder="Optional tagline"
+                      onChange={(e) => setBrandData({...brandData, tagline: e.target.value})}
+                      className="form-input bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                     />
                   </div>
-                  
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
+                    <label className="form-label">Primary Color</label>
                     <div className="flex items-center space-x-3">
                       <input
                         type="color"
                         value={brandData.primaryColor}
-                        onChange={(e) => setBrandData(prev => ({ ...prev, primaryColor: e.target.value }))}
-                        className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
+                        onChange={(e) => setBrandData({...brandData, primaryColor: e.target.value})}
+                        className="w-12 h-10 border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
                       />
                       <input
                         type="text"
                         value={brandData.primaryColor}
-                        onChange={(e) => setBrandData(prev => ({ ...prev, primaryColor: e.target.value }))}
-                        className="form-input flex-1"
-                        placeholder="#3B82F6"
+                        onChange={(e) => setBrandData({...brandData, primaryColor: e.target.value})}
+                        className="form-input bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                   </div>
-                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Secondary Color</label>
+                    <label className="form-label">Secondary Color</label>
                     <div className="flex items-center space-x-3">
                       <input
                         type="color"
                         value={brandData.secondaryColor}
-                        onChange={(e) => setBrandData(prev => ({ ...prev, secondaryColor: e.target.value }))}
-                        className="w-12 h-10 border border-gray-300 rounded cursor-pointer"
+                        onChange={(e) => setBrandData({...brandData, secondaryColor: e.target.value})}
+                        className="w-12 h-10 border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
                       />
                       <input
                         type="text"
                         value={brandData.secondaryColor}
-                        onChange={(e) => setBrandData(prev => ({ ...prev, secondaryColor: e.target.value }))}
-                        className="form-input flex-1"
-                        placeholder="#10B981"
+                        onChange={(e) => setBrandData({...brandData, secondaryColor: e.target.value})}
+                        className="form-input bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                       />
                     </div>
-                  </div>
-                  
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">School Logo</label>
-                    <div className="flex items-center space-x-4">
-                      {brandSettings?.logoUrl && (
-                        <img
-                          src={brandSettings.logoUrl}
-                          alt="Current logo"
-                          className="w-16 h-16 object-contain border border-gray-200 rounded-lg"
-                        />
-                      )}
-                      <div className="flex-1">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileSelect}
-                          className="form-input"
-                        />
-                        <p className="mt-1 text-xs text-gray-500">Upload a new logo (PNG, JPG, max 5MB)</p>
-                      </div>
-                    </div>
-                    {logoFile && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-sm font-medium text-gray-900">{logoFile.name}</p>
-                        <p className="text-xs text-gray-500">{(logoFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                      </div>
-                    )}
                   </div>
                 </div>
-                
+                <div>
+                  <label className="form-label">Logo</label>
+                  <div className="flex items-center space-x-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="form-input bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+                    />
+                    {brandSettings?.logo && (
+                      <img
+                        src={brandSettings.logo}
+                        alt="Current logo"
+                        className="w-12 h-12 object-cover rounded border border-gray-300 dark:border-gray-600"
+                      />
+                    )}
+                  </div>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Maximum file size: 5MB
+                  </p>
+                </div>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-300">
+                    <strong>Note:</strong> Changes will be applied after saving and refreshing the page.
+                  </p>
+                </div>
                 <div className="flex justify-end">
                   <button
                     type="submit"
                     disabled={saving}
-                    className="btn btn-primary disabled:opacity-50"
+                    className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? (
-                      <>
-                        <LoadingSpinner size="sm" className="mr-2" />
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
                         Saving...
-                      </>
+                      </div>
                     ) : (
                       'Save Brand Settings'
                     )}

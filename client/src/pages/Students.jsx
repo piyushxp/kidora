@@ -42,7 +42,7 @@ const Students = () => {
   };
 
   const handleDelete = async (studentId) => {
-    if (!window.confirm('Are you sure you want to delete this student?')) {
+    if (!window.confirm('Are you sure you want to deactivate this student?')) {
       return;
     }
 
@@ -51,10 +51,10 @@ const Students = () => {
       await axios.delete(`${API_BASE_URL}/students/${studentId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Student deleted successfully');
+      toast.success('Student deactivated successfully');
       fetchStudents();
     } catch (error) {
-      toast.error('Failed to delete student');
+      toast.error('Failed to deactivate student');
     }
   };
 
@@ -273,7 +273,7 @@ const Students = () => {
                           <button
                             onClick={() => handleDelete(student._id)}
                             className="p-2 text-danger-600 dark:text-danger-400 hover:text-danger-800 dark:hover:text-danger-300 hover:bg-danger-50 dark:hover:bg-danger-900/30 rounded-lg transition-colors"
-                            title="Delete Student"
+                            title="Deactivate Student"
                           >
                             <TrashIcon className="icon-sm" />
                           </button>

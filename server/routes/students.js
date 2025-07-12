@@ -2,9 +2,20 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const Student = require('../models/Student');
 const { auth, requireSuperAdmin, requireAnyRole } = require('../middleware/auth');
-const { uploadPhoto, uploadDocument, handleUploadError, uploadStudentFiles } = require('../middleware/upload');
+const { uploadPhoto, uploadDocument, handleUploadError, uploadStudentFiles, isS3Configured } = require('../middleware/upload');
 
 const router = express.Router();
+
+// Helper function to get file URL based on storage type
+const getFileUrl = (file) => {
+  if (isS3Configured) {
+    // For S3, multer-s3 provides the location URL
+    return file.location;
+  } else {
+    // For local storage, construct the path
+    return `/uploads/${file.filename}`;
+  }
+};
 
 // @route   POST /api/students
 // @desc    Add new student (Super Admin only)
@@ -82,13 +93,19 @@ router.post('/', [
       studentData.documents = {};
       
       if (req.files.photo && req.files.photo[0]) {
-        studentData.documents.photo = `/uploads/photos/${req.files.photo[0].filename}`;
+        studentData.documents.photo = isS3Configured 
+          ? req.files.photo[0].location 
+          : `/uploads/photos/${req.files.photo[0].filename}`;
       }
       if (req.files.birthCertificate && req.files.birthCertificate[0]) {
-        studentData.documents.birthCertificate = `/uploads/documents/${req.files.birthCertificate[0].filename}`;
+        studentData.documents.birthCertificate = isS3Configured 
+          ? req.files.birthCertificate[0].location 
+          : `/uploads/documents/${req.files.birthCertificate[0].filename}`;
       }
       if (req.files.idProof && req.files.idProof[0]) {
-        studentData.documents.idProof = `/uploads/documents/${req.files.idProof[0].filename}`;
+        studentData.documents.idProof = isS3Configured 
+          ? req.files.idProof[0].location 
+          : `/uploads/documents/${req.files.idProof[0].filename}`;
       }
     }
 
@@ -145,9 +162,12 @@ router.get('/', auth, async (req, res) => {
       query.assignedClass = className;
     }
 
-    // Filter by status if provided
+    // Filter by status if provided, otherwise default to active students only
     if (status) {
       query.isActive = status === 'active';
+    } else {
+      // Default: only show active students
+      query.isActive = true;
     }
 
     const students = await Student.find(query)
@@ -278,13 +298,19 @@ router.put('/:id', [
       }
 
       if (req.files.photo && req.files.photo[0]) {
-        student.documents.photo = `/uploads/photos/${req.files.photo[0].filename}`;
+        student.documents.photo = isS3Configured 
+          ? req.files.photo[0].location 
+          : `/uploads/photos/${req.files.photo[0].filename}`;
       }
       if (req.files.birthCertificate && req.files.birthCertificate[0]) {
-        student.documents.birthCertificate = `/uploads/documents/${req.files.birthCertificate[0].filename}`;
+        student.documents.birthCertificate = isS3Configured 
+          ? req.files.birthCertificate[0].location 
+          : `/uploads/documents/${req.files.birthCertificate[0].filename}`;
       }
       if (req.files.idProof && req.files.idProof[0]) {
-        student.documents.idProof = `/uploads/documents/${req.files.idProof[0].filename}`;
+        student.documents.idProof = isS3Configured 
+          ? req.files.idProof[0].location 
+          : `/uploads/documents/${req.files.idProof[0].filename}`;
       }
     }
 
@@ -350,7 +376,11 @@ router.post('/:id/documents', [
       return res.status(400).json({ message: 'No document uploaded' });
     }
 
-    student.documents[documentType] = `/uploads/documents/${req.file.filename}`;
+    const fileUrl = isS3Configured 
+      ? req.file.location 
+      : `/uploads/documents/${req.file.filename}`;
+
+    student.documents[documentType] = fileUrl;
     await student.save();
 
     res.json({
@@ -359,6 +389,31 @@ router.post('/:id/documents', [
     });
   } catch (error) {
     console.error('Upload document error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   DELETE /api/students/:id
+// @desc    Deactivate student (instead of deleting) (Super Admin only)
+// @access  Private (Super Admin)
+router.delete('/:id', [auth, requireSuperAdmin], async (req, res) => {
+  try {
+    const student = await Student.findById(req.params.id);
+    
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // Deactivate the student instead of deleting
+    student.isActive = false;
+    await student.save();
+
+    res.json({
+      message: 'Student deactivated successfully',
+      student
+    });
+  } catch (error) {
+    console.error('Deactivate student error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

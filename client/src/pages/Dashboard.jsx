@@ -57,8 +57,8 @@ const Dashboard = () => {
       value: stats.totalStudents,
       icon: UsersIcon,
       gradient: 'gradient-primary',
-      bgColor: 'bg-primary-50',
-      iconColor: 'text-primary-600',
+      bgColor: 'bg-primary-50 dark:bg-primary-900/30',
+      iconColor: 'text-primary-600 dark:text-primary-400',
       href: '/students'
     },
     {
@@ -66,8 +66,8 @@ const Dashboard = () => {
       value: stats.totalTeachers,
       icon: UserGroupIcon,
       gradient: 'gradient-success',
-      bgColor: 'bg-success-50',
-      iconColor: 'text-success-600',
+      bgColor: 'bg-success-50 dark:bg-success-900/30',
+      iconColor: 'text-success-600 dark:text-success-400',
       href: '/teachers'
     },
     {
@@ -75,8 +75,8 @@ const Dashboard = () => {
       value: stats.todayAttendance,
       icon: CalendarIcon,
       gradient: 'gradient-warning',
-      bgColor: 'bg-warning-50',
-      iconColor: 'text-warning-600',
+      bgColor: 'bg-warning-50 dark:bg-warning-900/30',
+      iconColor: 'text-warning-600 dark:text-warning-400',
       href: '/attendance'
     },
     {
@@ -84,8 +84,8 @@ const Dashboard = () => {
       value: stats.pendingPayments,
       icon: CreditCardIcon,
       gradient: 'gradient-danger',
-      bgColor: 'bg-danger-50',
-      iconColor: 'text-danger-600',
+      bgColor: 'bg-danger-50 dark:bg-danger-900/30',
+      iconColor: 'text-danger-600 dark:text-danger-400',
       href: '/payments'
     },
     {
@@ -93,8 +93,8 @@ const Dashboard = () => {
       value: stats.totalPhotos,
       icon: PhotoIcon,
       gradient: 'bg-gradient-to-r from-purple-500 to-pink-500',
-      bgColor: 'bg-purple-50',
-      iconColor: 'text-purple-600',
+      bgColor: 'bg-purple-50 dark:bg-purple-900/30',
+      iconColor: 'text-purple-600 dark:text-purple-400',
       href: '/gallery'
     }
   ];
@@ -142,9 +142,9 @@ const Dashboard = () => {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center sm:text-left">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-base text-gray-600">
-          Welcome back, <span className="font-medium text-primary-600">{user?.name}</span>! Here's what's happening today.
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
+        <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
+          Welcome back, <span className="font-medium text-primary-600 dark:text-primary-400">{user?.name}</span>! Here's what's happening today.
         </p>
       </div>
 
@@ -162,8 +162,8 @@ const Dashboard = () => {
                   <card.icon className={`icon-md ${card.iconColor}`} />
                 </div>
                 <div className="ml-4 flex-1">
-                  <p className="text-sm font-medium text-gray-600 mb-1">{card.name}</p>
-                  <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{card.name}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{card.value}</p>
                 </div>
               </div>
             </div>
@@ -175,8 +175,8 @@ const Dashboard = () => {
       <div className="card">
         <div className="card-header">
           <div className="flex items-center">
-            <ChartBarIcon className="icon-md text-gray-600 mr-3" />
-            <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+            <ChartBarIcon className="icon-md text-gray-600 dark:text-gray-400 mr-3" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Quick Actions</h3>
           </div>
         </div>
         <div className="card-body">
@@ -206,8 +206,8 @@ const Dashboard = () => {
           <div className="card-header">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <UsersIcon className="icon-md text-gray-600 mr-3" />
-                <h3 className="text-lg font-semibold text-gray-900">Recent Students</h3>
+                <UsersIcon className="icon-md text-gray-600 dark:text-gray-400 mr-3" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Students</h3>
               </div>
               <Link
                 to="/students"
@@ -222,7 +222,7 @@ const Dashboard = () => {
             <div className="space-y-4">
               {recentStudents.length > 0 ? (
                 recentStudents.map((student) => (
-                  <div key={student._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                  <div key={student._id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                     <div className="flex items-center">
                       <div className="w-10 h-10 gradient-primary rounded-full flex items-center justify-center shadow-soft">
                         <span className="text-sm font-semibold text-white">
@@ -230,8 +230,8 @@ const Dashboard = () => {
                         </span>
                       </div>
                       <div className="ml-4">
-                        <p className="text-sm font-semibold text-gray-900">{student.name}</p>
-                        <p className="text-xs text-gray-500">{student.assignedClass}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{student.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{student.assignedClass}</p>
                       </div>
                     </div>
                     <span className={`badge ${
@@ -245,8 +245,8 @@ const Dashboard = () => {
                 ))
               ) : (
                 <div className="text-center py-8">
-                  <UsersIcon className="icon-xl mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-500">No students found</p>
+                  <UsersIcon className="icon-xl mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400">No students found</p>
                 </div>
               )}
             </div>
@@ -258,8 +258,8 @@ const Dashboard = () => {
           <div className="card-header">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <ClockIcon className="icon-md text-gray-600 mr-3" />
-                <h3 className="text-lg font-semibold text-gray-900">Recent Attendance</h3>
+                <ClockIcon className="icon-md text-gray-600 dark:text-gray-400 mr-3" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Attendance</h3>
               </div>
               <Link
                 to="/attendance"
@@ -274,7 +274,7 @@ const Dashboard = () => {
             <div className="space-y-4">
               {recentAttendance.length > 0 ? (
                 recentAttendance.map((record) => (
-                  <div key={record._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                  <div key={record._id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                     <div className="flex items-center">
                       <div className="w-10 h-10 gradient-success rounded-full flex items-center justify-center shadow-soft">
                         <span className="text-sm font-semibold text-white">
@@ -282,8 +282,8 @@ const Dashboard = () => {
                         </span>
                       </div>
                       <div className="ml-4">
-                        <p className="text-sm font-semibold text-gray-900">{record.student.name}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{record.student.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {new Date(record.date).toLocaleDateString()}
                         </p>
                       </div>
@@ -301,8 +301,8 @@ const Dashboard = () => {
                 ))
               ) : (
                 <div className="text-center py-8">
-                  <ClockIcon className="icon-xl mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-500">No attendance records found</p>
+                  <ClockIcon className="icon-xl mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400">No attendance records found</p>
                 </div>
               )}
             </div>
@@ -315,8 +315,8 @@ const Dashboard = () => {
         <div className="card">
           <div className="card-header">
             <div className="flex items-center">
-              <Cog6ToothIcon className="icon-md text-gray-600 mr-3" />
-              <h3 className="text-lg font-semibold text-gray-900">Admin Quick Links</h3>
+              <Cog6ToothIcon className="icon-md text-gray-600 dark:text-gray-400 mr-3" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Admin Quick Links</h3>
             </div>
           </div>
           <div className="card-body">

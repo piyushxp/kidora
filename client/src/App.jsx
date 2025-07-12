@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -16,6 +17,7 @@ import ClassManagement from './pages/ClassManagement';
 import ClassForm from './pages/ClassForm';
 import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -42,7 +44,7 @@ const AppContent = () => {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <div className="min-h-screen bg-gray-50 transition-colors">
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={
@@ -84,8 +86,10 @@ const AppContent = () => {
             } />
           </Route>
 
-          {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* Catch all route - redirect based on authentication status */}
+          <Route path="*" element={
+            user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+          } />
         </Routes>
       </div>
     </Router>
@@ -98,6 +102,7 @@ const App = () => {
     <ThemeProvider>
       <AuthProvider>
         <AppContent />
+        <PWAInstallPrompt />
         <Toaster
           position="top-right"
           toastOptions={{

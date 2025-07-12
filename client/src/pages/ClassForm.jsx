@@ -244,7 +244,7 @@ function ClassForm() {
   if (loading && isEdit) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
       </div>
     );
   }
@@ -256,15 +256,15 @@ function ClassForm() {
         <div>
           <Link
             to="/classes"
-            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-2"
+            className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mb-2 transition-colors"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-1" />
             Back to Classes
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {isEdit ? 'Edit Class' : 'Add New Class'}
           </h1>
-          <p className="mt-2 text-sm text-gray-700">
+          <p className="mt-2 text-sm text-gray-700 dark:text-gray-400">
             {isEdit ? 'Update class information and settings' : 'Create a new class with teacher assignment'}
           </p>
         </div>
@@ -272,15 +272,15 @@ function ClassForm() {
 
       {/* Alert Message */}
       {error && (
-        <div className="rounded-md bg-red-50 p-4">
+        <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4 border border-red-200 dark:border-red-800">
           <div className="flex">
-            <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />
+            <ExclamationTriangleIcon className="h-5 w-5 text-red-400 dark:text-red-300" />
             <div className="ml-3">
-              <p className="text-sm text-red-800">{error}</p>
+              <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
             </div>
             <button
               onClick={() => setError('')}
-              className="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg p-1.5 hover:bg-red-100"
+              className="ml-auto -mx-1.5 -my-1.5 bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 rounded-lg p-1.5 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
             >
               ×
             </button>
@@ -290,390 +290,404 @@ function ClassForm() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Information */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Class Name *
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="e.g., Nursery A, Kindergarten B"
-                required
-              />
-            </div>
+        <div className="card">
+          <div className="card-body">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Basic Information</h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <label htmlFor="name" className="form-label">
+                  Class Name *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="e.g., Nursery A, Kindergarten B"
+                  required
+                />
+              </div>
 
-            <div>
-              <label htmlFor="capacity" className="block text-sm font-medium text-gray-700">
-                Capacity *
-              </label>
-              <input
-                type="number"
-                id="capacity"
-                name="capacity"
-                value={formData.capacity}
-                onChange={handleInputChange}
-                min="1"
-                max="50"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              />
-            </div>
+              <div>
+                <label htmlFor="capacity" className="form-label">
+                  Capacity *
+                </label>
+                <input
+                  type="number"
+                  id="capacity"
+                  name="capacity"
+                  value={formData.capacity}
+                  onChange={handleInputChange}
+                  min="1"
+                  max="50"
+                  className="form-input"
+                  required
+                />
+              </div>
 
-            <div>
-              <label htmlFor="academicYear" className="block text-sm font-medium text-gray-700">
-                Academic Year *
-              </label>
-              <select
-                id="academicYear"
-                name="academicYear"
-                value={formData.academicYear}
-                onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              >
-                <option value="2023-2024">2023-2024</option>
-                <option value="2024-2025">2024-2025</option>
-                <option value="2025-2026">2025-2026</option>
-              </select>
-            </div>
+              <div>
+                <label htmlFor="academicYear" className="form-label">
+                  Academic Year *
+                </label>
+                <select
+                  id="academicYear"
+                  name="academicYear"
+                  value={formData.academicYear}
+                  onChange={handleInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="2023-2024">2023-2024</option>
+                  <option value="2024-2025">2024-2025</option>
+                  <option value="2025-2026">2025-2026</option>
+                </select>
+              </div>
 
-            <div>
-              <label htmlFor="room" className="block text-sm font-medium text-gray-700">
-                Room
-              </label>
-              <input
-                type="text"
-                id="room"
-                name="room"
-                value={formData.room}
-                onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="e.g., Room 101, Blue Room"
-              />
-            </div>
+              <div>
+                <label htmlFor="room" className="form-label">
+                  Room
+                </label>
+                <input
+                  type="text"
+                  id="room"
+                  name="room"
+                  value={formData.room}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="e.g., Room 101, Blue Room"
+                />
+              </div>
 
-            <div className="sm:col-span-2">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Description
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={3}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Brief description of the class"
-              />
+              <div className="sm:col-span-2">
+                <label htmlFor="description" className="form-label">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="form-textarea"
+                  placeholder="Brief description of the class"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Teacher Assignment */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Teacher Assignment</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div>
-              <label htmlFor="classTeacher" className="block text-sm font-medium text-gray-700">
-                Class Teacher *
-              </label>
-              <select
-                id="classTeacher"
-                name="classTeacher"
-                value={formData.classTeacher}
-                onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              >
-                <option value="">Select a teacher...</option>
-                {availableTeachers.map((teacher) => (
-                  <option key={teacher._id} value={teacher._id}>
-                    {teacher.name} ({teacher.email})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Assistant Teachers
-              </label>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {availableTeachers.filter(t => t._id !== formData.classTeacher).map((teacher) => (
-                  <label key={teacher._id} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.assistantTeachers.includes(teacher._id)}
-                      onChange={() => handleAssistantTeacherChange(teacher._id)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">
+        <div className="card">
+          <div className="card-body">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Teacher Assignment</h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <label htmlFor="classTeacher" className="form-label">
+                  Class Teacher *
+                </label>
+                <select
+                  id="classTeacher"
+                  name="classTeacher"
+                  value={formData.classTeacher}
+                  onChange={handleInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select a teacher...</option>
+                  {availableTeachers.map((teacher) => (
+                    <option key={teacher._id} value={teacher._id}>
                       {teacher.name} ({teacher.email})
-                    </span>
-                  </label>
-                ))}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="form-label mb-2">
+                  Assistant Teachers
+                </label>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {availableTeachers.filter(t => t._id !== formData.classTeacher).map((teacher) => (
+                    <label key={teacher._id} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.assistantTeachers.includes(teacher._id)}
+                        onChange={() => handleAssistantTeacherChange(teacher._id)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
+                      />
+                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        {teacher.name} ({teacher.email})
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Schedule */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Schedule</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div>
-              <label htmlFor="schedule.startTime" className="block text-sm font-medium text-gray-700">
-                Start Time *
-              </label>
-              <select
-                id="schedule.startTime"
-                name="schedule.startTime"
-                value={formData.schedule.startTime}
-                onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              >
-                <option value="">Select start time...</option>
-                {timeSlots.map((time) => (
-                  <option key={time} value={time}>{time}</option>
-                ))}
-              </select>
-            </div>
+        <div className="card">
+          <div className="card-body">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Schedule</h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <label htmlFor="schedule.startTime" className="form-label">
+                  Start Time *
+                </label>
+                <select
+                  id="schedule.startTime"
+                  name="schedule.startTime"
+                  value={formData.schedule.startTime}
+                  onChange={handleInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select start time...</option>
+                  {timeSlots.map((time) => (
+                    <option key={time} value={time}>{time}</option>
+                  ))}
+                </select>
+              </div>
 
-            <div>
-              <label htmlFor="schedule.endTime" className="block text-sm font-medium text-gray-700">
-                End Time *
-              </label>
-              <select
-                id="schedule.endTime"
-                name="schedule.endTime"
-                value={formData.schedule.endTime}
-                onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              >
-                <option value="">Select end time...</option>
-                {timeSlots.map((time) => (
-                  <option key={time} value={time}>{time}</option>
-                ))}
-              </select>
-            </div>
+              <div>
+                <label htmlFor="schedule.endTime" className="form-label">
+                  End Time *
+                </label>
+                <select
+                  id="schedule.endTime"
+                  name="schedule.endTime"
+                  value={formData.schedule.endTime}
+                  onChange={handleInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select end time...</option>
+                  {timeSlots.map((time) => (
+                    <option key={time} value={time}>{time}</option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Days of Week *
-              </label>
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-7">
-                {daysOfWeek.map((day) => (
-                  <label key={day} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.schedule.daysOfWeek.includes(day)}
-                      onChange={() => handleDayChange(day)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <span className="ml-1 text-sm text-gray-700">{day.slice(0, 3)}</span>
-                  </label>
-                ))}
+              <div className="sm:col-span-2">
+                <label className="form-label mb-2">
+                  Days of Week *
+                </label>
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-7">
+                  {daysOfWeek.map((day) => (
+                    <label key={day} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.schedule.daysOfWeek.includes(day)}
+                        onChange={() => handleDayChange(day)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
+                      />
+                      <span className="ml-1 text-sm text-gray-700 dark:text-gray-300">{day.slice(0, 3)}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Age Group */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Age Group</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div>
-              <label htmlFor="ageGroup.minAge" className="block text-sm font-medium text-gray-700">
-                Minimum Age (years) *
-              </label>
-              <input
-                type="number"
-                id="ageGroup.minAge"
-                name="ageGroup.minAge"
-                value={formData.ageGroup.minAge}
-                onChange={handleInputChange}
-                min="1"
-                max="10"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              />
-            </div>
+        <div className="card">
+          <div className="card-body">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Age Group</h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <label htmlFor="ageGroup.minAge" className="form-label">
+                  Minimum Age (years) *
+                </label>
+                <input
+                  type="number"
+                  id="ageGroup.minAge"
+                  name="ageGroup.minAge"
+                  value={formData.ageGroup.minAge}
+                  onChange={handleInputChange}
+                  min="1"
+                  max="10"
+                  className="form-input"
+                  required
+                />
+              </div>
 
-            <div>
-              <label htmlFor="ageGroup.maxAge" className="block text-sm font-medium text-gray-700">
-                Maximum Age (years) *
-              </label>
-              <input
-                type="number"
-                id="ageGroup.maxAge"
-                name="ageGroup.maxAge"
-                value={formData.ageGroup.maxAge}
-                onChange={handleInputChange}
-                min="1"
-                max="10"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              />
+              <div>
+                <label htmlFor="ageGroup.maxAge" className="form-label">
+                  Maximum Age (years) *
+                </label>
+                <input
+                  type="number"
+                  id="ageGroup.maxAge"
+                  name="ageGroup.maxAge"
+                  value={formData.ageGroup.maxAge}
+                  onChange={handleInputChange}
+                  min="1"
+                  max="10"
+                  className="form-input"
+                  required
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Fee Structure */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Fee Structure</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            <div>
-              <label htmlFor="feeStructure.monthlyFee" className="block text-sm font-medium text-gray-700">
-                Monthly Fee *
-              </label>
-              <input
-                type="number"
-                id="feeStructure.monthlyFee"
-                name="feeStructure.monthlyFee"
-                value={formData.feeStructure.monthlyFee}
-                onChange={handleInputChange}
-                min="0"
-                step="0.01"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                required
-              />
-            </div>
+        <div className="card">
+          <div className="card-body">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Fee Structure</h2>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+              <div>
+                <label htmlFor="feeStructure.monthlyFee" className="form-label">
+                  Monthly Fee *
+                </label>
+                <input
+                  type="number"
+                  id="feeStructure.monthlyFee"
+                  name="feeStructure.monthlyFee"
+                  value={formData.feeStructure.monthlyFee}
+                  onChange={handleInputChange}
+                  min="0"
+                  step="0.01"
+                  className="form-input"
+                  required
+                />
+              </div>
 
-            <div>
-              <label htmlFor="feeStructure.transportFee" className="block text-sm font-medium text-gray-700">
-                Transport Fee
-              </label>
-              <input
-                type="number"
-                id="feeStructure.transportFee"
-                name="feeStructure.transportFee"
-                value={formData.feeStructure.transportFee}
-                onChange={handleInputChange}
-                min="0"
-                step="0.01"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              />
-            </div>
+              <div>
+                <label htmlFor="feeStructure.transportFee" className="form-label">
+                  Transport Fee
+                </label>
+                <input
+                  type="number"
+                  id="feeStructure.transportFee"
+                  name="feeStructure.transportFee"
+                  value={formData.feeStructure.transportFee}
+                  onChange={handleInputChange}
+                  min="0"
+                  step="0.01"
+                  className="form-input"
+                />
+              </div>
 
-            <div>
-              <label htmlFor="feeStructure.activityFee" className="block text-sm font-medium text-gray-700">
-                Activity Fee
-              </label>
-              <input
-                type="number"
-                id="feeStructure.activityFee"
-                name="feeStructure.activityFee"
-                value={formData.feeStructure.activityFee}
-                onChange={handleInputChange}
-                min="0"
-                step="0.01"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              />
+              <div>
+                <label htmlFor="feeStructure.activityFee" className="form-label">
+                  Activity Fee
+                </label>
+                <input
+                  type="number"
+                  id="feeStructure.activityFee"
+                  name="feeStructure.activityFee"
+                  value={formData.feeStructure.activityFee}
+                  onChange={handleInputChange}
+                  min="0"
+                  step="0.01"
+                  className="form-input"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Subjects */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Subjects</h2>
-          
-          {/* Add New Subject */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-4">
-            <div>
-              <input
-                type="text"
-                value={newSubject.name}
-                onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })}
-                placeholder="Subject name"
-                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              />
+        <div className="card">
+          <div className="card-body">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Subjects</h2>
+            
+            {/* Add New Subject */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-4">
+              <div>
+                <input
+                  type="text"
+                  value={newSubject.name}
+                  onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })}
+                  placeholder="Subject name"
+                  className="form-input"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  value={newSubject.description}
+                  onChange={(e) => setNewSubject({ ...newSubject, description: e.target.value })}
+                  placeholder="Description (optional)"
+                  className="form-input"
+                />
+              </div>
+              <div>
+                <button
+                  type="button"
+                  onClick={handleAddSubject}
+                  className="btn btn-primary"
+                >
+                  <PlusIcon className="h-4 w-4 mr-1" />
+                  Add Subject
+                </button>
+              </div>
             </div>
-            <div>
-              <input
-                type="text"
-                value={newSubject.description}
-                onChange={(e) => setNewSubject({ ...newSubject, description: e.target.value })}
-                placeholder="Description (optional)"
-                className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              />
-            </div>
-            <div>
-              <button
-                type="button"
-                onClick={handleAddSubject}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <PlusIcon className="h-4 w-4 mr-1" />
-                Add Subject
-              </button>
-            </div>
-          </div>
 
-          {/* Subjects List */}
-          {formData.subjects.length > 0 && (
-            <div className="space-y-2">
-              {formData.subjects.map((subject, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                  <div>
-                    <div className="font-medium text-gray-900">{subject.name}</div>
-                    {subject.description && (
-                      <div className="text-sm text-gray-500">{subject.description}</div>
-                    )}
+            {/* Subjects List */}
+            {formData.subjects.length > 0 && (
+              <div className="space-y-2">
+                {formData.subjects.map((subject, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                    <div>
+                      <div className="font-medium text-gray-900 dark:text-gray-100">{subject.name}</div>
+                      {subject.description && (
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{subject.description}</div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSubject(index)}
+                      className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveSubject(index)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Additional Information */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Additional Information</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-                Notes
-              </label>
-              <textarea
-                id="notes"
-                name="notes"
-                value={formData.notes}
-                onChange={handleInputChange}
-                rows={3}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Any additional notes about the class"
-              />
-            </div>
+        <div className="card">
+          <div className="card-body">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Additional Information</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="notes" className="form-label">
+                  Notes
+                </label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="form-textarea"
+                  placeholder="Any additional notes about the class"
+                />
+              </div>
 
-            <div className="flex items-center">
-              <input
-                id="isActive"
-                name="isActive"
-                type="checkbox"
-                checked={formData.isActive}
-                onChange={handleInputChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
-                Class is active
-              </label>
+              <div className="flex items-center">
+                <input
+                  id="isActive"
+                  name="isActive"
+                  type="checkbox"
+                  checked={formData.isActive}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
+                />
+                <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900 dark:text-gray-100">
+                  Class is active
+                </label>
+              </div>
             </div>
           </div>
         </div>
@@ -682,14 +696,14 @@ function ClassForm() {
         <div className="flex justify-end space-x-3">
           <Link
             to="/classes"
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="btn btn-outline"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="btn btn-primary disabled:opacity-50"
           >
             {loading ? 'Saving...' : (isEdit ? 'Update Class' : 'Create Class')}
           </button>

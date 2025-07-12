@@ -5,7 +5,9 @@ import toast from 'react-hot-toast';
 import {
   ArrowLeftIcon,
   PhotoIcon,
-  DocumentIcon
+  DocumentIcon,
+  XMarkIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
@@ -44,6 +46,16 @@ const StudentForm = () => {
     }
   });
   const [files, setFiles] = useState({
+    photo: null,
+    birthCertificate: null,
+    idProof: null
+  });
+  const [existingDocuments, setExistingDocuments] = useState({
+    photo: null,
+    birthCertificate: null,
+    idProof: null
+  });
+  const [filePreviews, setFilePreviews] = useState({
     photo: null,
     birthCertificate: null,
     idProof: null
@@ -125,6 +137,15 @@ const StudentForm = () => {
           otherFees: student.feeStructure?.otherFees || ''
         }
       });
+
+      // Set existing documents
+      if (student.documents) {
+        setExistingDocuments({
+          photo: student.documents.photo || null,
+          birthCertificate: student.documents.birthCertificate || null,
+          idProof: student.documents.idProof || null
+        });
+      }
     } catch (error) {
       toast.error('Failed to fetch student details');
       navigate('/students');
@@ -156,11 +177,57 @@ const StudentForm = () => {
   const handleFileChange = (e, field) => {
     const file = e.target.files[0];
     if (file) {
+      // Update files state
       setFiles(prev => ({
         ...prev,
         [field]: file
       }));
+
+      // Create preview for the file
+      if (field === 'photo' && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFilePreviews(prev => ({
+            ...prev,
+            [field]: reader.result
+          }));
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // For non-image files, store file info
+        setFilePreviews(prev => ({
+          ...prev,
+          [field]: {
+            name: file.name,
+            size: file.size,
+            type: file.type
+          }
+        }));
+      }
     }
+  };
+
+  const removeFile = (field) => {
+    setFiles(prev => ({
+      ...prev,
+      [field]: null
+    }));
+    setFilePreviews(prev => ({
+      ...prev,
+      [field]: null
+    }));
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const openDocument = (url) => {
+    window.open(url, '_blank');
   };
 
   const handleSubmit = async (e) => {
@@ -214,10 +281,131 @@ const StudentForm = () => {
     }
   };
 
+  const renderFileUpload = (field, label, accept, icon) => {
+    const hasNewFile = files[field];
+    const hasExistingFile = existingDocuments[field];
+    const preview = filePreviews[field];
+    const Icon = icon;
+
+    return (
+      <div>
+        <label className="form-label">{label}</label>
+        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md bg-gray-50">
+          <div className="space-y-1 text-center w-full">
+            {hasNewFile && preview ? (
+              <div className="space-y-3">
+                {field === 'photo' && typeof preview === 'string' ? (
+                  <div className="relative">
+                    <img 
+                      src={preview} 
+                      alt="Preview" 
+                      className="mx-auto h-32 w-32 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeFile(field)}
+                      className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    >
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                    <div className="flex items-center space-x-3">
+                      <DocumentIcon className="h-8 w-8 text-gray-400" />
+                      <div className="text-left">
+                        <p className="text-sm font-medium text-gray-900">{preview.name}</p>
+                        <p className="text-xs text-gray-500">{formatFileSize(preview.size)}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(field)}
+                      className="p-1 text-gray-400 hover:text-red-500"
+                    >
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : hasExistingFile ? (
+              <div className="space-y-3">
+                {field === 'photo' ? (
+                  <div className="relative">
+                    <img 
+                      src={hasExistingFile} 
+                      alt="Student photo" 
+                      className="mx-auto h-32 w-32 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => openDocument(hasExistingFile)}
+                      className="absolute -top-2 -right-2 p-1 bg-blue-500 text-white rounded-full hover:bg-blue-600"
+                    >
+                      <EyeIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+                    <div className="flex items-center space-x-3">
+                      <DocumentIcon className="h-8 w-8 text-gray-400" />
+                      <div className="text-left">
+                        <p className="text-sm font-medium text-gray-900">
+                          {label} (Uploaded)
+                        </p>
+                        <p className="text-xs text-gray-500">Click to view</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => openDocument(hasExistingFile)}
+                      className="p-1 text-blue-500 hover:text-blue-600"
+                    >
+                      <EyeIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+                <div className="text-center">
+                  <label className="cursor-pointer text-sm text-blue-600 hover:text-blue-500">
+                    <span>Replace file</span>
+                    <input
+                      type="file"
+                      accept={accept}
+                      onChange={(e) => handleFileChange(e, field)}
+                      className="sr-only"
+                    />
+                  </label>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <Icon className="mx-auto h-12 w-12 text-gray-400" />
+                <div className="flex text-sm text-gray-600">
+                  <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 transition-colors">
+                    <span>Upload a file</span>
+                    <input
+                      type="file"
+                      accept={accept}
+                      onChange={(e) => handleFileChange(e, field)}
+                      className="sr-only"
+                    />
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500">
+                  {field === 'photo' ? 'PNG, JPG, GIF up to 5MB' : 'PDF, JPG, PNG up to 5MB'}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -229,15 +417,15 @@ const StudentForm = () => {
         <div className="flex items-center space-x-3">
           <button
             onClick={() => navigate('/students')}
-            className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
           >
             <ArrowLeftIcon className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-bold text-gray-900">
               {id && id !== 'new' ? 'Edit Student' : 'Add New Student'}
             </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-sm text-gray-500">
               {id && id !== 'new' ? 'Update student information' : 'Enter student details'}
             </p>
           </div>
@@ -248,7 +436,7 @@ const StudentForm = () => {
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="card">
           <div className="card-body">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-6">Basic Information</h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">Basic Information</h3>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
@@ -320,9 +508,9 @@ const StudentForm = () => {
                     name="isActive"
                     checked={formData.isActive}
                     onChange={handleChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Active Student</span>
+                  <span className="ml-2 text-sm text-gray-700">Active Student</span>
                 </label>
               </div>
             </div>
@@ -332,7 +520,7 @@ const StudentForm = () => {
         {/* Parent Information */}
         <div className="card">
           <div className="card-body">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-6">Parent Information</h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">Parent Information</h3>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
@@ -389,7 +577,7 @@ const StudentForm = () => {
         {/* Emergency Contact */}
         <div className="card">
           <div className="card-body">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-6">Emergency Contact</h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">Emergency Contact</h3>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
               <div>
@@ -432,7 +620,7 @@ const StudentForm = () => {
         {/* Medical Information */}
         <div className="card">
           <div className="card-body">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-6">Medical Information</h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">Medical Information</h3>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
@@ -477,7 +665,7 @@ const StudentForm = () => {
         {/* Fee Structure */}
         <div className="card">
           <div className="card-body">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-6">Fee Structure</h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">Fee Structure</h3>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
               <div>
@@ -526,68 +714,12 @@ const StudentForm = () => {
         {/* Documents */}
         <div className="card">
           <div className="card-body">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-6">Documents</h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">Documents</h3>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-              <div>
-                <label className="form-label">Student Photo</label>
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md bg-gray-50 dark:bg-gray-700">
-                  <div className="space-y-1 text-center">
-                    <PhotoIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
-                    <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                      <label className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors">
-                        <span>Upload a file</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleFileChange(e, 'photo')}
-                          className="sr-only"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="form-label">Birth Certificate</label>
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md bg-gray-50 dark:bg-gray-700">
-                  <div className="space-y-1 text-center">
-                    <DocumentIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
-                    <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                      <label className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors">
-                        <span>Upload a file</span>
-                        <input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => handleFileChange(e, 'birthCertificate')}
-                          className="sr-only"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="form-label">ID Proof</label>
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md bg-gray-50 dark:bg-gray-700">
-                  <div className="space-y-1 text-center">
-                    <DocumentIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
-                    <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                      <label className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors">
-                        <span>Upload a file</span>
-                        <input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => handleFileChange(e, 'idProof')}
-                          className="sr-only"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {renderFileUpload('photo', 'Student Photo', 'image/*', PhotoIcon)}
+              {renderFileUpload('birthCertificate', 'Birth Certificate', '.pdf,.jpg,.jpeg,.png', DocumentIcon)}
+              {renderFileUpload('idProof', 'ID Proof', '.pdf,.jpg,.jpeg,.png', DocumentIcon)}
             </div>
           </div>
         </div>

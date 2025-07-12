@@ -109,8 +109,8 @@ const Payments = () => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Payments</h1>
-          <p className="mt-2 text-base text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Payments</h1>
+          <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
             Manage student invoices and payment tracking
           </p>
         </div>
@@ -127,8 +127,8 @@ const Payments = () => {
       <div className="card">
         <div className="card-header">
           <div className="flex items-center">
-            <FunnelIcon className="icon-md text-gray-600 mr-3" />
-            <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+            <FunnelIcon className="icon-md text-gray-600 dark:text-gray-400 mr-3" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Filters</h3>
             {hasFilters && (
               <span className="ml-2 badge badge-primary">{filteredInvoices.length} results</span>
             )}
@@ -138,13 +138,13 @@ const Payments = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Search */}
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 icon-sm text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 icon-sm text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 placeholder="Search students..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="form-input pl-10"
+                className="form-input pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
               />
             </div>
 
@@ -152,7 +152,7 @@ const Payments = () => {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="form-select"
+              className="form-select bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             >
               <option value="">All Status</option>
               <option value="pending">Pending</option>
@@ -164,7 +164,7 @@ const Payments = () => {
             <select
               value={filterMonth}
               onChange={(e) => setFilterMonth(e.target.value)}
-              className="form-select"
+              className="form-select bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             >
               <option value="">All Months</option>
               {months.map((month, index) => (
@@ -190,8 +190,8 @@ const Payments = () => {
         <div className="card-header">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <CreditCardIcon className="icon-md text-gray-600 mr-3" />
-              <h3 className="text-lg font-semibold text-gray-900">
+              <CreditCardIcon className="icon-md text-gray-600 dark:text-gray-400 mr-3" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 Invoices ({filteredInvoices.length})
               </h3>
             </div>
@@ -201,107 +201,102 @@ const Payments = () => {
         {filteredInvoices.length === 0 ? (
           <div className="card-body">
             <div className="text-center py-12">
-              <DocumentTextIcon className="icon-xl mx-auto text-gray-300 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No invoices found</h3>
-              <p className="text-gray-600 mb-6">
-                {hasFilters 
-                  ? 'Try adjusting your search or filter criteria.'
-                  : 'No invoices have been generated yet.'
-                }
+              <CreditCardIcon className="icon-xl mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                No invoices found
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400">
+                {hasFilters ? 'Try adjusting your filters.' : 'Generate your first invoice to get started.'}
               </p>
-              {!hasFilters && (
-                <button
-                  onClick={() => toast.info('Invoice generation feature coming soon!')}
-                  className="btn btn-primary"
-                >
-                  <PlusIcon className="icon-sm mr-2" />
-                  Generate Invoice
-                </button>
-              )}
             </div>
           </div>
         ) : (
           <div className="overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="table">
-                <thead className="table-header">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="table-header-cell">Student</th>
-                    <th className="table-header-cell">Invoice Type</th>
-                    <th className="table-header-cell">Amount</th>
-                    <th className="table-header-cell">Due Date</th>
-                    <th className="table-header-cell">Status</th>
-                    <th className="table-header-cell">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Student
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Due Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="table-body">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredInvoices.map((invoice) => (
-                    <tr key={invoice._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="table-cell">
+                    <tr key={invoice._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="w-10 h-10 gradient-primary rounded-full flex items-center justify-center shadow-soft">
-                            <span className="text-sm font-semibold text-white">
+                          <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-white">
                               {invoice.student.name.charAt(0).toUpperCase()}
                             </span>
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-semibold text-gray-900">{invoice.student.name}</div>
-                            <div className="text-xs text-gray-500">{invoice.student.parentName}</div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                              {invoice.student.name}
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              {invoice.student.parentName}
+                            </div>
                           </div>
                         </div>
                       </td>
-                      <td className="table-cell">
-                        <span className="badge badge-primary capitalize">
-                          {invoice.invoiceType}
-                        </span>
-                      </td>
-                      <td className="table-cell">
-                        <div className="text-sm font-semibold text-gray-900">
-                          ${invoice.totalAmount}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 dark:text-gray-100">
+                          {new Date(invoice.dueDate).toLocaleDateString()}
                         </div>
-                        {invoice.remainingAmount > 0 && (
-                          <div className="text-xs text-danger-600">
-                            ${invoice.remainingAmount} remaining
-                          </div>
-                        )}
                       </td>
-                      <td className="table-cell text-sm text-gray-900">
-                        {new Date(invoice.dueDate).toLocaleDateString()}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          ${invoice.amount?.toFixed(2) || '0.00'}
+                        </div>
                       </td>
-                      <td className="table-cell">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {getStatusIcon(invoice.status)}
                           <span className={`ml-2 badge ${getStatusColor(invoice.status)}`}>
-                            {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                            {invoice.status}
                           </span>
                         </div>
                       </td>
-                      <td className="table-cell">
-                        <div className="flex items-center space-x-2">
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <div className="flex items-center justify-center space-x-2">
                           <button
                             onClick={() => toast.info('View invoice feature coming soon!')}
-                            className="p-2 text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-lg transition-colors"
+                            className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                             title="View Invoice"
                           >
                             <EyeIcon className="icon-sm" />
                           </button>
-                          {invoice.status === 'pending' && (
-                            <button
-                              onClick={() => handleStatusUpdate(invoice._id, 'paid')}
-                              className="p-2 text-success-600 hover:text-success-800 hover:bg-success-50 rounded-lg transition-colors"
-                              title="Mark as Paid"
+                          <button
+                            onClick={() => toast.info('Download invoice feature coming soon!')}
+                            className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                            title="Download Invoice"
+                          >
+                            <DocumentTextIcon className="icon-sm" />
+                          </button>
+                          {invoice.status !== 'paid' && (
+                            <select
+                              value={invoice.status}
+                              onChange={(e) => handleStatusUpdate(invoice._id, e.target.value)}
+                              className="text-xs border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded px-2 py-1"
                             >
-                              <CheckCircleIcon className="icon-sm" />
-                            </button>
-                          )}
-                          {invoice.status === 'pending' && (
-                            <button
-                              onClick={() => handleStatusUpdate(invoice._id, 'overdue')}
-                              className="p-2 text-danger-600 hover:text-danger-800 hover:bg-danger-50 rounded-lg transition-colors"
-                              title="Mark as Overdue"
-                            >
-                              <XCircleIcon className="icon-sm" />
-                            </button>
+                              <option value="pending">Pending</option>
+                              <option value="paid">Paid</option>
+                              <option value="overdue">Overdue</option>
+                            </select>
                           )}
                         </div>
                       </td>
@@ -312,6 +307,43 @@ const Payments = () => {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Payment Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200 dark:border-green-800">
+          <div className="flex items-center">
+            <CheckCircleIcon className="icon-md text-green-600 dark:text-green-400 mr-3" />
+            <div>
+              <h4 className="text-lg font-semibold text-green-800 dark:text-green-300">Paid</h4>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                ${filteredInvoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + (i.amount || 0), 0).toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg border border-yellow-200 dark:border-yellow-800">
+          <div className="flex items-center">
+            <ClockIcon className="icon-md text-yellow-600 dark:text-yellow-400 mr-3" />
+            <div>
+              <h4 className="text-lg font-semibold text-yellow-800 dark:text-yellow-300">Pending</h4>
+              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                ${filteredInvoices.filter(i => i.status === 'pending').reduce((sum, i) => sum + (i.amount || 0), 0).toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-200 dark:border-red-800">
+          <div className="flex items-center">
+            <XCircleIcon className="icon-md text-red-600 dark:text-red-400 mr-3" />
+            <div>
+              <h4 className="text-lg font-semibold text-red-800 dark:text-red-300">Overdue</h4>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                ${filteredInvoices.filter(i => i.status === 'overdue').reduce((sum, i) => sum + (i.amount || 0), 0).toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

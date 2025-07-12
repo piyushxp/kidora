@@ -172,7 +172,7 @@ const Attendance = () => {
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="form-input"
+                  className="form-input bg-white border-gray-300 text-gray-900"
                 />
               </div>
               
@@ -189,7 +189,7 @@ const Attendance = () => {
               <select
                 value={filterClass}
                 onChange={(e) => setFilterClass(e.target.value)}
-                className="form-select"
+                className="form-select bg-white border-gray-300 text-gray-900"
               >
                 <option value="">All Classes</option>
                 {classes.map((className) => (
@@ -200,13 +200,13 @@ const Attendance = () => {
               <button
                 onClick={handleSaveAttendance}
                 disabled={saving}
-                className="btn btn-primary disabled:opacity-50"
+                className="btn btn-primary shadow-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? (
-                  <>
-                    <LoadingSpinner size="sm" className="mr-2" />
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
                     Saving...
-                  </>
+                  </div>
                 ) : (
                   'Save Attendance'
                 )}
@@ -215,47 +215,33 @@ const Attendance = () => {
           </div>
 
           {/* Stats */}
-          <div className="mt-6 grid grid-cols-3 gap-4">
-            <div className="card bg-success-50 border-success-200">
-              <div className="card-body p-4">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-success-500 rounded-lg flex items-center justify-center text-white">
-                    <CheckIcon className="icon-md" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-success-800">Present</p>
-                    <p className="text-2xl font-bold text-success-900">{statusCounts.present || 0}</p>
-                  </div>
-                </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <div className="flex items-center">
+                <CheckIcon className="icon-sm text-green-600 mr-2" />
+                <span className="text-sm font-medium text-green-800">Present</span>
               </div>
+              <p className="text-2xl font-bold text-green-600">{statusCounts.present || 0}</p>
             </div>
-            
-            <div className="card bg-danger-50 border-danger-200">
-              <div className="card-body p-4">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-danger-500 rounded-lg flex items-center justify-center text-white">
-                    <XMarkIcon className="icon-md" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-danger-800">Absent</p>
-                    <p className="text-2xl font-bold text-danger-900">{statusCounts.absent || 0}</p>
-                  </div>
-                </div>
+            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+              <div className="flex items-center">
+                <XMarkIcon className="icon-sm text-red-600 mr-2" />
+                <span className="text-sm font-medium text-red-800">Absent</span>
               </div>
+              <p className="text-2xl font-bold text-red-600">{statusCounts.absent || 0}</p>
             </div>
-            
-            <div className="card bg-warning-50 border-warning-200">
-              <div className="card-body p-4">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-warning-500 rounded-lg flex items-center justify-center text-white">
-                    <ClockIcon className="icon-md" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-warning-800">Late</p>
-                    <p className="text-2xl font-bold text-warning-900">{statusCounts.late || 0}</p>
-                  </div>
-                </div>
+            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+              <div className="flex items-center">
+                <ClockIcon className="icon-sm text-yellow-600 mr-2" />
+                <span className="text-sm font-medium text-yellow-800">Late</span>
               </div>
+              <p className="text-2xl font-bold text-yellow-600">{statusCounts.late || 0}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div className="flex items-center">
+                <span className="text-sm font-medium text-gray-700">Total</span>
+              </div>
+              <p className="text-2xl font-bold text-gray-700">{filteredStudents.length}</p>
             </div>
           </div>
         </div>
@@ -264,82 +250,111 @@ const Attendance = () => {
       {/* Students List */}
       <div className="card">
         <div className="card-header">
-          <div className="flex items-center">
-            <ClockIcon className="icon-md text-gray-600 mr-3" />
+          <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">
               Students ({filteredStudents.length})
             </h3>
           </div>
         </div>
-        <div className="card-body">
-          {filteredStudents.length === 0 ? (
+
+        {filteredStudents.length === 0 ? (
+          <div className="card-body">
             <div className="text-center py-12">
-              <ClockIcon className="icon-xl mx-auto text-gray-300 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No students found</h3>
-              <p className="text-gray-600">
-                {filterClass ? 'No students in the selected class.' : 'No students available for attendance.'}
+              <CalendarIcon className="icon-xl mx-auto text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No students found
+              </h3>
+              <p className="text-gray-500">
+                {filterClass ? 'No students in the selected class.' : 'Add some students to start taking attendance.'}
               </p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredStudents.map((student) => (
-                <div key={student._id} className="card border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="card-body p-4">
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 gradient-primary rounded-full flex items-center justify-center shadow-soft">
-                        <span className="text-sm font-semibold text-white">
-                          {student.name.charAt(0).toUpperCase()}
+          </div>
+        ) : (
+          <div className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Student
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Class
+                    </th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Attendance
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredStudents.map((student) => (
+                    <tr key={student._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-white">
+                              {student.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {student.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {student.parentName}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                          {student.assignedClass}
                         </span>
-                      </div>
-                      <div className="ml-3 flex-1">
-                        <h4 className="text-sm font-semibold text-gray-900">{student.name}</h4>
-                        <p className="text-xs text-gray-500">{student.assignedClass}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-2">
-                      <button
-                        onClick={() => handleAttendanceChange(student._id, 'present')}
-                        className={`p-3 rounded-lg text-center transition-all ${
-                          attendance[student._id] === 'present'
-                            ? 'bg-success-500 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-600 hover:bg-success-100'
-                        }`}
-                      >
-                        <CheckIcon className="icon-sm mx-auto mb-1" />
-                        <span className="text-xs font-medium">Present</span>
-                      </button>
-                      
-                      <button
-                        onClick={() => handleAttendanceChange(student._id, 'absent')}
-                        className={`p-3 rounded-lg text-center transition-all ${
-                          attendance[student._id] === 'absent'
-                            ? 'bg-danger-500 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-600 hover:bg-danger-100'
-                        }`}
-                      >
-                        <XMarkIcon className="icon-sm mx-auto mb-1" />
-                        <span className="text-xs font-medium">Absent</span>
-                      </button>
-                      
-                      <button
-                        onClick={() => handleAttendanceChange(student._id, 'late')}
-                        className={`p-3 rounded-lg text-center transition-all ${
-                          attendance[student._id] === 'late'
-                            ? 'bg-warning-500 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-600 hover:bg-warning-100'
-                        }`}
-                      >
-                        <ClockIcon className="icon-sm mx-auto mb-1" />
-                        <span className="text-xs font-medium">Late</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <div className="flex items-center justify-center space-x-2">
+                          <button
+                            onClick={() => handleAttendanceChange(student._id, 'present')}
+                            className={`p-2 rounded-lg transition-all ${
+                              attendance[student._id] === 'present'
+                                ? 'bg-green-100 text-green-600 ring-2 ring-green-500'
+                                : 'bg-gray-100 text-gray-400 hover:bg-green-50 hover:text-green-600'
+                            }`}
+                            title="Present"
+                          >
+                            <CheckIcon className="icon-sm" />
+                          </button>
+                          <button
+                            onClick={() => handleAttendanceChange(student._id, 'absent')}
+                            className={`p-2 rounded-lg transition-all ${
+                              attendance[student._id] === 'absent'
+                                ? 'bg-red-100 text-red-600 ring-2 ring-red-500'
+                                : 'bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-600'
+                            }`}
+                            title="Absent"
+                          >
+                            <XMarkIcon className="icon-sm" />
+                          </button>
+                          <button
+                            onClick={() => handleAttendanceChange(student._id, 'late')}
+                            className={`p-2 rounded-lg transition-all ${
+                              attendance[student._id] === 'late'
+                                ? 'bg-yellow-100 text-yellow-600 ring-2 ring-yellow-500'
+                                : 'bg-gray-100 text-gray-400 hover:bg-yellow-50 hover:text-yellow-600'
+                            }`}
+                            title="Late"
+                          >
+                            <ClockIcon className="icon-sm" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

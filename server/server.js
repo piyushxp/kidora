@@ -14,6 +14,10 @@ const uploadRoutes = require('./routes/uploads');
 const brandingRoutes = require('./routes/branding');
 const dashboardRoutes = require('./routes/dashboard');
 const classRoutes = require('./routes/classes');
+const galleryRoutes = require('./routes/gallery');
+
+// Import S3 validation
+const { isAWSConfigured, validateS3Setup } = require('./config/aws');
 
 const app = express();
 
@@ -22,8 +26,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve static files from uploads directory (only if not using S3)
+if (!isAWSConfigured()) {
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+}
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -36,15 +42,22 @@ app.use('/api/uploads', uploadRoutes);
 app.use('/api/branding', brandingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/classes', classRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 // Default route
 app.get('/', (req, res) => {
-  res.json({ message: 'Playschool Manager API is running!' });
+  res.json({ message: 'Kidora Playschool Manager API is running!' });
 });
 
 // Health check route
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Playschool Manager API is running' });
+  const uploadConfig = isAWSConfigured() ? 'AWS S3' : 'Local Storage';
+  res.json({ 
+    status: 'OK', 
+    message: 'Kidora Playschool Manager API is running',
+    uploadConfig: uploadConfig,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Error handling middleware
@@ -58,17 +71,45 @@ app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-const PORT =  5001;
+const PORT = process.env.PORT || 5001;
 
-// console.log(process.env.MONGODB_URI);
+// Initialize file upload configuration
+const initializeFileUpload = async () => {
+  console.log('\n📁 File Upload Configuration:');
+  
+  if (isAWSConfigured()) {
+    console.log('☁️  AWS S3 configuration detected');
+    const isS3Valid = await validateS3Setup();
+    
+    if (isS3Valid) {
+      console.log('✅ S3 setup validated successfully');
+      console.log(`📦 Bucket: ${process.env.S3_BUCKET_NAME}`);
+      console.log(`🌍 Region: ${process.env.AWS_REGION || 'us-east-1'}`);
+    } else {
+      console.log('❌ S3 validation failed - falling back to local storage');
+    }
+  } else {
+    console.log('💾 Using local file storage');
+    console.log('💡 To use S3, set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and S3_BUCKET_NAME');
+  }
+  
+  console.log('');
+};
+
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('Connected to MongoDB');
+  .then(async () => {
+    console.log('✅ Connected to MongoDB');
+    
+    // Initialize file upload configuration
+    await initializeFileUpload();
+    
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
     });
   })
   .catch((err) => {
-    console.error('MongoDB connection error:', err);
+    console.error('❌ MongoDB connection error:', err);
+    process.exit(1);
   }); 
