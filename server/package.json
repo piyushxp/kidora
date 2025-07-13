@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "build": "echo 'No build step required for Node.js'",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test-s3": "node scripts/test-s3.js",
     "fix-s3": "node scripts/fix-s3-access.js"
