@@ -14,6 +14,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
+import http from '../utils/http';
 
 const Payments = () => {
   const [invoices, setInvoices] = useState([]);
@@ -28,7 +29,7 @@ const Payments = () => {
 
   const fetchInvoices = async () => {
     try {
-      const response = await axios.get('/invoices');
+      const response = await http.get('/invoices');
       setInvoices(response.data.invoices || []);
     } catch (error) {
       toast.error('Failed to fetch invoices');
@@ -39,7 +40,7 @@ const Payments = () => {
 
   const handleStatusUpdate = async (invoiceId, status) => {
     try {
-      await axios.put(`/invoices/${invoiceId}/status`, { status });
+      await http.put(`/invoices/${invoiceId}/status`, { status });
       toast.success('Payment status updated successfully');
       fetchInvoices();
     } catch (error) {

@@ -12,6 +12,7 @@ import {
   PhotoIcon
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
+import http from '../utils/http';
 
 const Settings = () => {
   const { user, updateProfile, changePassword, brandSettings } = useAuth();
@@ -123,7 +124,7 @@ const Settings = () => {
         formData.append('logo', logoFile);
       }
 
-      await axios.put('/branding/settings', formData);
+      await http.put('/branding/settings', formData);
       toast.success('Brand settings updated successfully');
       // Refresh the page to apply new settings
       window.location.reload();

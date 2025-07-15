@@ -21,17 +21,39 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['super_admin', 'teacher'],
+    enum: ['dev_admin', 'super_admin', 'teacher'],
     default: 'teacher'
   },
   phone: {
     type: String,
     trim: true
   },
+  bloodGroup: {
+    type: String,
+    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+  },
+  // Super Admin specific fields
   isActive: {
     type: Boolean,
     default: true
   },
+  hasPaidThisMonth: {
+    type: Boolean,
+    default: false
+  },
+  accessibleModules: {
+    teachers: { type: Boolean, default: true },
+    students: { type: Boolean, default: true },
+    classes: { type: Boolean, default: true },
+    attendance: { type: Boolean, default: true },
+    gallery: { type: Boolean, default: true },
+    stockManagement: { type: Boolean, default: false },
+    assignments: { type: Boolean, default: false }
+  },
+  schoolName: { type: String },
+  schoolAddress: { type: String },
+  country: { type: String },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // dev_admin ID
   assignedClass: {
     type: String,
     trim: true

@@ -3,6 +3,7 @@ const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { auth, requireSuperAdmin } = require('../middleware/auth');
 const { uploadProfileImage, handleUploadError } = require('../middleware/upload');
+const { enforceTenantScope, addTenantFilter, getTenantScope, requireTenantAccess } = require('../middleware/tenant');
 
 const router = express.Router();
 
@@ -12,12 +13,14 @@ const router = express.Router();
 router.post('/', [
   auth,
   requireSuperAdmin,
+  enforceTenantScope,
   uploadProfileImage,
   body('name').notEmpty().withMessage('Teacher name is required'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('assignedClass').notEmpty().withMessage('Assigned class is required'),
-  body('phone').optional().isMobilePhone().withMessage('Valid phone number is required')
+  // body('assignedClass').notEmpty().withMessage('Assigned class is required'),
+  body('phone').optional().isMobilePhone().withMessage('Valid phone number is required'),
+  body('bloodGroup').optional().isIn(['A+','A-','B+','B-','AB+','AB-','O+','O-']).withMessage('Invalid blood group')
 ], handleUploadError, async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -25,23 +28,27 @@ router.post('/', [
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    const { name, email, password, phone, assignedClass, isActive } = req.body;
+    const { name, email, password, phone, assignedClass, bloodGroup, isActive } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already exists' });
     }
+    
 
     const teacherData = {
       name,
       email,
       password,
       role: 'teacher',
-      assignedClass,
+      // assignedClass,
       isActive: isActive === 'true' || isActive === true,
-      phone: phone || undefined
+      phone: phone || undefined,
+      bloodGroup,
+      createdBy: req.user._id // Teachers are created by and belong to the super_admin
     };
+    console.log(teacherData);
 
     // Add profile image if uploaded
     if (req.file) {
@@ -67,7 +74,7 @@ router.post('/', [
 // @route   GET /api/teachers
 // @desc    Get all teachers (Super Admin only)
 // @access  Private (Super Admin)
-router.get('/', [auth, requireSuperAdmin], async (req, res) => {
+router.get('/', [auth, requireSuperAdmin, enforceTenantScope], async (req, res) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
     const skip = (page - 1) * limit;
@@ -78,6 +85,9 @@ router.get('/', [auth, requireSuperAdmin], async (req, res) => {
     if (status) {
       query.isActive = status === 'active';
     }
+
+    // Apply tenant filter
+    query = addTenantFilter(req, query);
 
     const teachers = await User.find(query)
       .select('-password')
@@ -104,9 +114,10 @@ router.get('/', [auth, requireSuperAdmin], async (req, res) => {
 // @route   GET /api/teachers/classes
 // @desc    Get all unique teacher classes (Super Admin only)
 // @access  Private (Super Admin)
-router.get('/classes', [auth, requireSuperAdmin], async (req, res) => {
+router.get('/classes', [auth, requireSuperAdmin, enforceTenantScope], async (req, res) => {
   try {
-    const classes = await User.distinct('assignedClass', { role: 'teacher' });
+    const filter = addTenantFilter(req, { role: 'teacher' });
+    const classes = await User.distinct('assignedClass', filter);
     res.json(classes);
   } catch (error) {
     console.error('Get teacher classes error:', error);
@@ -168,7 +179,8 @@ router.put('/:id', [
   body('name').optional().notEmpty().withMessage('Name cannot be empty'),
   body('email').optional().isEmail().withMessage('Valid email is required'),
   body('assignedClass').optional().notEmpty().withMessage('Assigned class cannot be empty'),
-  body('phone').optional().isMobilePhone().withMessage('Valid phone number is required')
+  body('phone').optional().isMobilePhone().withMessage('Valid phone number is required'),
+  body('bloodGroup').optional().isIn(['A+','A-','B+','B-','AB+','AB-','O+','O-']).withMessage('Invalid blood group'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);

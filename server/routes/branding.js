@@ -3,6 +3,7 @@ const { body, validationResult } = require('express-validator');
 const BrandSettings = require('../models/BrandSettings');
 const { auth, requireSuperAdmin } = require('../middleware/auth');
 const { uploadLogo, handleUploadError } = require('../middleware/upload');
+const { enforceTenantScope, addTenantFilter, getTenantScope } = require('../middleware/tenant');
 
 const router = express.Router();
 
@@ -35,18 +36,19 @@ router.get('/', async (req, res) => {
 // @route   GET /api/branding/history
 // @desc    Get brand settings history (Super Admin only)
 // @access  Private (Super Admin)
-router.get('/history', [auth, requireSuperAdmin], async (req, res) => {
+router.get('/history', [auth, requireSuperAdmin, enforceTenantScope], async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
 
-    const brandSettings = await BrandSettings.find()
+    const filter = addTenantFilter(req, {});
+    const brandSettings = await BrandSettings.find(filter)
       .populate('updatedBy', 'name')
       .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
 
-    const total = await BrandSettings.countDocuments();
+    const total = await BrandSettings.countDocuments(filter);
 
     res.json({
       brandSettings,
@@ -102,24 +104,22 @@ router.get('/preview', async (req, res) => {
 });
 
 // @route   GET /api/branding/settings
-// @desc    Get current brand settings for dashboard/app usage
+// @desc    Get current brand settings for the tenant
 // @access  Private
-router.get('/settings', auth, async (req, res) => {
+router.get('/settings', auth, enforceTenantScope, async (req, res) => {
   try {
-    let brandSettings = await BrandSettings.findOne({ isActive: true });
+    const filter = addTenantFilter(req, { isActive: true });
+    let brandSettings = await BrandSettings.findOne(filter);
 
-    // If no brand settings exist, create default ones
-    if (!brandSettings) {
+    // If no brand settings exist for this tenant, create default ones
+    if (!brandSettings && req.user.role === 'super_admin') {
       brandSettings = new BrandSettings({
-        schoolName: 'Playschool Manager',
+        schoolName: req.user.schoolName || 'Playschool Manager',
         primaryColor: '#3B82F6',
         secondaryColor: '#1E40AF',
         tagline: 'Nurturing Young Minds',
-        address: '',
-        phone: '',
-        email: '',
-        website: '',
-        isActive: true
+        isActive: true,
+        createdBy: req.user._id
       });
       await brandSettings.save();
     }

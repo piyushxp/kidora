@@ -60,6 +60,11 @@ const brandSettingsSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -70,8 +75,8 @@ const brandSettingsSchema = new mongoose.Schema({
   }
 });
 
-// Ensure only one active brand setting
-brandSettingsSchema.index({ isActive: 1 }, { unique: true, sparse: true });
+// Ensure only one active brand setting per tenant
+brandSettingsSchema.index({ createdBy: 1, isActive: 1 }, { unique: true, sparse: true });
 
 // Update timestamp on save
 brandSettingsSchema.pre('save', function(next) {

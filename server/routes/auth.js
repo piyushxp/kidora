@@ -40,6 +40,8 @@ router.post('/login', [
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+    console.log('Login request received', req.body);
+
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -73,7 +75,7 @@ router.post('/register', [
   body('email').isEmail().withMessage('Please enter a valid email'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   body('role').isIn(['teacher']).withMessage('Invalid role'),
-  body('assignedClass').notEmpty().withMessage('Assigned class is required')
+  // body('assignedClass').notEmpty().withMessage('Assigned class is required')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -95,7 +97,7 @@ router.post('/register', [
       email,
       password,
       role,
-      assignedClass,
+      // assignedClass,
       phone
     });
 
@@ -108,7 +110,7 @@ router.post('/register', [
         name: user.name,
         email: user.email,
         role: user.role,
-        assignedClass: user.assignedClass
+        // assignedClass: user.assignedClass
       }
     });
   } catch (error) {

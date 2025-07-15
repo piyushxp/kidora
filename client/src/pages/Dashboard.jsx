@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import { api } from '../utils/http';
 import {
   UsersIcon,
   UserGroupIcon,
@@ -33,9 +33,9 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const [statsRes, studentsRes, attendanceRes] = await Promise.all([
-          axios.get('/dashboard/stats'),
-          axios.get('/students?limit=5'),
-          axios.get('/attendance/recent')
+          api.get('/dashboard/stats'),
+          api.get('/students?limit=5'),
+          api.get('/attendance/recent')
         ]);
 
         setStats(statsRes.data);

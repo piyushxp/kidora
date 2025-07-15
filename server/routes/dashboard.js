@@ -5,13 +5,14 @@ const Attendance = require('../models/Attendance');
 const Invoice = require('../models/Invoice');
 const Photo = require('../models/Photo');
 const { auth, requireAnyRole } = require('../middleware/auth');
+const { enforceTenantScope, addTenantFilter } = require('../middleware/tenant');
 
 const router = express.Router();
 
 // @route   GET /api/dashboard/stats
 // @desc    Get dashboard statistics
 // @access  Private
-router.get('/stats', auth, async (req, res) => {
+router.get('/stats', auth, enforceTenantScope, async (req, res) => {
   try {
     // Get today's date for attendance calculation
     const today = new Date();
@@ -26,26 +27,26 @@ router.get('/stats', auth, async (req, res) => {
       pendingInvoices,
       totalPhotos
     ] = await Promise.all([
-      // Count total active students
-      Student.countDocuments({ isActive: true }),
+      // Count total active students (tenant scoped)
+      Student.countDocuments(addTenantFilter(req, { isActive: true })),
       
-      // Count total active teachers (excluding super admin)
-      User.countDocuments({ role: 'teacher', isActive: true }),
+      // Count total active teachers (tenant scoped)
+      User.countDocuments(addTenantFilter(req, { role: 'teacher', isActive: true })),
       
-      // Count today's attendance records where students were present
-      Attendance.countDocuments({
+      // Count today's attendance records where students were present (tenant scoped)
+      Attendance.countDocuments(addTenantFilter(req, {
         date: {
           $gte: startOfDay,
           $lt: endOfDay
         },
         status: { $in: ['present', 'late'] }
-      }),
+      })),
       
-      // Count pending/unpaid invoices
-      Invoice.countDocuments({ status: { $in: ['unpaid', 'partial'] } }),
+      // Count pending/unpaid invoices (tenant scoped)
+      Invoice.countDocuments(addTenantFilter(req, { status: { $in: ['unpaid', 'partial'] } })),
       
-      // Count total photos
-      Photo.countDocuments({})
+      // Count total photos (tenant scoped)
+      Photo.countDocuments(addTenantFilter(req, {}))
     ]);
 
     const stats = {
@@ -66,24 +67,24 @@ router.get('/stats', auth, async (req, res) => {
 // @route   GET /api/dashboard/recent-activities
 // @desc    Get recent activities for dashboard
 // @access  Private
-router.get('/recent-activities', auth, async (req, res) => {
+router.get('/recent-activities', auth, enforceTenantScope, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
 
-    // Get recent students, invoices, and photos
+    // Get recent students, invoices, and photos (tenant scoped)
     const [recentStudents, recentInvoices, recentPhotos] = await Promise.all([
-      Student.find({ isActive: true })
+      Student.find(addTenantFilter(req, { isActive: true }))
         .sort({ createdAt: -1 })
         .limit(5)
         .select('name assignedClass createdAt'),
       
-      Invoice.find({})
+      Invoice.find(addTenantFilter(req, {}))
         .sort({ createdAt: -1 })
         .limit(5)
         .populate('student', 'name')
         .select('invoiceNumber totalAmount status createdAt student'),
       
-      Photo.find({})
+      Photo.find(addTenantFilter(req, {}))
         .sort({ createdAt: -1 })
         .limit(5)
         .populate('uploadedBy', 'name')

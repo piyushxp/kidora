@@ -15,6 +15,8 @@ const brandingRoutes = require('./routes/branding');
 const dashboardRoutes = require('./routes/dashboard');
 const classRoutes = require('./routes/classes');
 const galleryRoutes = require('./routes/gallery');
+const devAdminRoutes = require('./routes/devAdmin');
+const assignmentRoutes = require('./routes/assignments');
 
 // Import S3 validation
 const { isAWSConfigured, validateS3Setup } = require('./config/aws');
@@ -43,6 +45,8 @@ app.use('/api/branding', brandingRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/dev-admin', devAdminRoutes);
+app.use('/api/assignments', assignmentRoutes);
 
 // Default route
 app.get('/', (req, res) => {
@@ -104,9 +108,10 @@ mongoose
     // Initialize file upload configuration
     await initializeFileUpload();
     
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
+      console.log(`🌐 Network access: http://0.0.0.0:${PORT}/api/health`);
     });
   })
   .catch((err) => {

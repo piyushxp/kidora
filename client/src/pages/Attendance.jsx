@@ -11,6 +11,7 @@ import {
   ClockIcon
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
+import http from '../utils/http';
 
 const Attendance = () => {
   const [students, setStudents] = useState([]);
@@ -32,7 +33,7 @@ const Attendance = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('/students');
+      const response = await http.get('/students');
       const studentsList = response.data.students || [];
       setStudents(studentsList);
       
@@ -51,13 +52,14 @@ const Attendance = () => {
 
   const fetchAttendance = async () => {
     try {
-      const response = await axios.get(`/attendance/date/${selectedDate}`);
+      const response = await http.get(`/attendance/date/${selectedDate}`);
       const existingAttendance = response.data || [];
       
       // Update attendance state with existing data
       const updatedAttendance = { ...attendance };
       existingAttendance.forEach(record => {
-        updatedAttendance[record.student] = record.status;
+        const studentId = typeof record.student === 'object' && record.student !== null ? record.student._id : record.student;
+        updatedAttendance[studentId] = record.status;
       });
       setAttendance(updatedAttendance);
     } catch (error) {
@@ -76,13 +78,27 @@ const Attendance = () => {
   const handleSaveAttendance = async () => {
     setSaving(true);
     try {
-      const attendanceData = Object.entries(attendance).map(([studentId, status]) => ({
-        student: studentId,
-        date: selectedDate,
-        status
-      }));
+      const isValidId = (id) => typeof id === 'string' && /^[a-fA-F0-9]{24}$/.test(id);
 
-      await axios.post('/attendance', { attendanceRecords: attendanceData });
+      // Build attendanceData with only valid student IDs
+      const attendanceData = Object.entries(attendance)
+        .filter(([studentId]) => isValidId(studentId))
+        .map(([studentId, status]) => ({
+          student: studentId,
+          date: selectedDate,
+          status
+        }));
+
+      // Remove any invalid keys from local attendance state to avoid future issues
+      const cleanedAttendance = {};
+      Object.entries(attendance).forEach(([studentId, status]) => {
+        if (isValidId(studentId)) {
+          cleanedAttendance[studentId] = status;
+        }
+      });
+      setAttendance(cleanedAttendance);
+
+      await http.post('/attendance', { attendanceRecords: attendanceData });
       toast.success('Attendance saved successfully');
     } catch (error) {
       toast.error('Failed to save attendance');

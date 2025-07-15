@@ -15,9 +15,13 @@ import StudentForm from './pages/StudentForm';
 import TeacherForm from './pages/TeacherForm';
 import ClassManagement from './pages/ClassManagement';
 import ClassForm from './pages/ClassForm';
+import Assignments from './pages/Assignments';
+import AssignmentForm from './pages/AssignmentForm';
+import AssignmentView from './pages/AssignmentView';
 import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
+import DevAdminDashboard from './pages/DevAdmin/DevAdminDashboard';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -69,6 +73,10 @@ const AppContent = () => {
             <Route path="payments" element={<Payments />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="assignments" element={<Assignments />} />
+            <Route path="assignments/create" element={<AssignmentForm />} />
+            <Route path="assignments/:id" element={<AssignmentView />} />
+            <Route path="assignments/:id/edit" element={<AssignmentForm />} />
             <Route path="classes" element={
               <ProtectedRoute allowedRoles={['super_admin']}>
                 <ClassManagement />
@@ -85,6 +93,13 @@ const AppContent = () => {
               </ProtectedRoute>
             } />
           </Route>
+
+          {/* Dev Admin Route */}
+          <Route path="/dev-admin/dashboard" element={
+            <ProtectedRoute allowedRoles={['dev_admin']}>
+              <DevAdminDashboard />
+            </ProtectedRoute>
+          } />
 
           {/* Catch all route - redirect based on authentication status */}
           <Route path="*" element={

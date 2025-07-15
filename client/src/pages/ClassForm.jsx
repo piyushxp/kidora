@@ -7,6 +7,7 @@ import {
   TrashIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import http from '../utils/http';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
@@ -71,7 +72,7 @@ function ClassForm() {
   const fetchAvailableTeachers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/classes/teachers/available`, {
+      const response = await http.get(`/classes/teachers/available`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -86,7 +87,7 @@ function ClassForm() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/classes/${id}`, {
+      const response = await http.get( `/classes/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -177,7 +178,7 @@ function ClassForm() {
 
     if (!formData.name.trim()) errors.push('Class name is required');
     if (!formData.capacity || parseInt(formData.capacity) < 1) errors.push('Valid capacity is required');
-    if (!formData.classTeacher) errors.push('Class teacher is required');
+    // if (!formData.classTeacher) errors.push('Class teacher is required');
     if (!formData.academicYear.trim()) errors.push('Academic year is required');
     if (!formData.schedule.startTime) errors.push('Start time is required');
     if (!formData.schedule.endTime) errors.push('End time is required');
@@ -224,11 +225,11 @@ function ClassForm() {
       };
 
       if (isEdit) {
-        await axios.put(`${API_BASE_URL}/classes/${id}`, submitData, {
+        await http.put(`/classes/${id}`, submitData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       } else {
-        await axios.post(`${API_BASE_URL}/classes`, submitData, {
+        await http.post(`/classes`, submitData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       }
@@ -385,7 +386,7 @@ function ClassForm() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label htmlFor="classTeacher" className="form-label">
-                  Class Teacher *
+                  Class Teacher
                 </label>
                 <select
                   id="classTeacher"
@@ -393,7 +394,6 @@ function ClassForm() {
                   value={formData.classTeacher}
                   onChange={handleInputChange}
                   className="form-select"
-                  required
                 >
                   <option value="">Select a teacher...</option>
                   {availableTeachers.map((teacher) => (

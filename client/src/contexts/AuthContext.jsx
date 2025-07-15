@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../utils/http';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
@@ -17,38 +17,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [brandSettings, setBrandSettings] = useState(null);
 
-  // Configure axios defaults
-  axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
-
-  // Add token to requests
-  axios.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
-
-  // Handle token expiration
-  axios.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      if (error.response?.status === 401) {
-        localStorage.removeItem('token');
-        setUser(null);
-        window.location.href = '/login';
-      }
-      return Promise.reject(error);
-    }
-  );
-
   // Load user on mount
   useEffect(() => {
     const loadUser = async () => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const response = await axios.get('/auth/me');
+          const response = await api.get('/auth/me');
           setUser(response.data);
         } catch (error) {
           localStorage.removeItem('token');
@@ -64,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const loadBrandSettings = async () => {
       try {
-        const response = await axios.get('/branding/settings');
+        const response = await api.get('/branding/settings');
         setBrandSettings(response.data);
       } catch (error) {
         // Use default settings if branding fails to load
@@ -85,12 +60,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/auth/login', { email, password });
+      const response = await api.post('/auth/login', { email, password });
       const { token, user } = response.data;
-      
+      debugger
       localStorage.setItem('token', token);
       setUser(user);
-      
+      localStorage.setItem('user', JSON.stringify(user));
+
       toast.success(`Welcome back, ${user.name}!`);
       return { success: true };
     } catch (error) {
@@ -102,6 +78,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
     setBrandSettings(null);
     toast.success('Logged out successfully');
@@ -109,7 +86,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (profileData) => {
     try {
-      const response = await axios.put('/auth/profile', profileData);
+      const response = await api.put('/auth/profile', profileData);
       setUser(response.data);
       toast.success('Profile updated successfully');
       return { success: true };
@@ -122,7 +99,7 @@ export const AuthProvider = ({ children }) => {
 
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      await axios.put('/auth/change-password', { currentPassword, newPassword });
+      await api.put('/auth/change-password', { currentPassword, newPassword });
       toast.success('Password changed successfully');
       return { success: true };
     } catch (error) {

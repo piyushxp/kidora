@@ -13,6 +13,7 @@ import {
   AcademicCapIcon
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
+import http from '../utils/http';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
@@ -53,7 +54,7 @@ const Gallery = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      let url = `${API_BASE_URL}/gallery?page=${currentPage}&limit=12`;
+      let url =  `/gallery?page=${currentPage}&limit=12`;
       
       if (searchTerm) {
         url += `&search=${encodeURIComponent(searchTerm)}`;
@@ -63,7 +64,7 @@ const Gallery = () => {
         url += `&classId=${selectedClass}`;
       }
 
-      const response = await axios.get(url, {
+      const response = await http.get(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -83,7 +84,7 @@ const Gallery = () => {
       setLoadingFilters(true);
       const token = localStorage.getItem('token');
       
-      const response = await axios.get(`${API_BASE_URL}/gallery/filters/options`, {
+      const response = await http.get( `/gallery/filters/options`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -142,7 +143,7 @@ const Gallery = () => {
       formData.append('caption', uploadForm.caption);
       formData.append('classTags', JSON.stringify(uploadForm.classTags));
 
-      await axios.post(`${API_BASE_URL}/gallery/upload`, formData, {
+      await http.post( `/gallery/upload`, formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -174,7 +175,7 @@ const Gallery = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API_BASE_URL}/gallery/${imageId}`, {
+      await http.delete( `/gallery/${imageId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

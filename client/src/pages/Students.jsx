@@ -13,6 +13,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
+import http from '../utils/http';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
@@ -30,7 +31,7 @@ const Students = () => {
   const fetchStudents = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/students`, {
+      const response = await http.get(`/students`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStudents(response.data.students || []);
@@ -48,7 +49,7 @@ const Students = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API_BASE_URL}/students/${studentId}`, {
+      await http.delete( `/students/${studentId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Student deactivated successfully');

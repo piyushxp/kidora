@@ -41,10 +41,35 @@ const requireSuperAdmin = requireRole(['super_admin']);
 const requireTeacher = requireRole(['teacher']);
 const requireAnyRole = requireRole(['super_admin', 'teacher']);
 
+// Check if user has access to specific modules
+const requireModuleAccess = (moduleName) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Authentication required.' });
+    }
+
+    // Dev admin has access to all modules
+    if (req.user.role === 'dev_admin') {
+      return next();
+    }
+
+    // Check if user has access to the module
+    if (!req.user.accessibleModules || !req.user.accessibleModules[moduleName]) {
+      return res.status(403).json({ message: `Access denied. ${moduleName} module not enabled.` });
+    }
+
+    next();
+  };
+};
+
+const requireAssignmentsAccess = requireModuleAccess('assignments');
+
 module.exports = {
   auth,
   requireRole,
   requireSuperAdmin,
   requireTeacher,
-  requireAnyRole
+  requireAnyRole,
+  requireModuleAccess,
+  requireAssignmentsAccess
 }; 

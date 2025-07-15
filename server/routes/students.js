@@ -3,6 +3,7 @@ const { body, validationResult } = require('express-validator');
 const Student = require('../models/Student');
 const { auth, requireSuperAdmin, requireAnyRole } = require('../middleware/auth');
 const { uploadPhoto, uploadDocument, handleUploadError, uploadStudentFiles, isS3Configured } = require('../middleware/upload');
+const { enforceTenantScope, addTenantFilter, getTenantScope, requireTenantAccess } = require('../middleware/tenant');
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ const getFileUrl = (file) => {
 router.post('/', [
   auth,
   requireSuperAdmin,
+  enforceTenantScope,
   uploadStudentFiles,
   body('name').notEmpty().withMessage('Student name is required'),
   body('dateOfBirth').isISO8601().withMessage('Valid date of birth is required'),
@@ -31,7 +33,9 @@ router.post('/', [
   body('parentEmail').isEmail().withMessage('Valid parent email is required'),
   body('parentPhone').notEmpty().withMessage('Parent phone is required'),
   body('parentAddress').notEmpty().withMessage('Parent address is required'),
-  body('assignedClass').notEmpty().withMessage('Assigned class is required')
+  // body('assignedClass').notEmpty().withMessage('Assigned class is required'),
+  body('ageGroup.maxAge').isInt({ min: 1, max: 10 }).withMessage('Maximum age must be between 1 and 10'),
+  body('bloodGroup').optional().isIn(['A+','A-','B+','B-','AB+','AB-','O+','O-']).withMessage('Invalid blood group'),
 ], handleUploadError, async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -63,7 +67,9 @@ router.post('/', [
       parentPhone,
       parentAddress,
       assignedClass,
-      isActive: isActive === 'true' || isActive === true || true // Default to true if not provided
+      bloodGroup: req.body.bloodGroup,
+      isActive: isActive === 'true' || isActive === true || true, // Default to true if not provided
+      createdBy: getTenantScope(req.user) || req.user._id // Set createdBy for tenant isolation
     };
 
     // Add fee structure if provided
@@ -145,7 +151,7 @@ router.post('/', [
 // @route   GET /api/students
 // @desc    Get all students (filtered by role)
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', auth, enforceTenantScope, async (req, res) => {
   try {
     const { page = 1, limit = 10, class: className, status } = req.query;
     const skip = (page - 1) * limit;
@@ -169,6 +175,9 @@ router.get('/', auth, async (req, res) => {
       // Default: only show active students
       query.isActive = true;
     }
+
+    // Apply tenant filter
+    query = addTenantFilter(req, query);
 
     const students = await Student.find(query)
       .sort({ createdAt: -1 })
@@ -194,9 +203,10 @@ router.get('/', auth, async (req, res) => {
 // @route   GET /api/students/classes
 // @desc    Get all unique classes
 // @access  Private
-router.get('/classes', auth, async (req, res) => {
+router.get('/classes', auth, enforceTenantScope, async (req, res) => {
   try {
-    const classes = await Student.distinct('assignedClass');
+    const filter = addTenantFilter(req, {});
+    const classes = await Student.distinct('assignedClass', filter);
     res.json(classes);
   } catch (error) {
     console.error('Get classes error:', error);
@@ -207,9 +217,10 @@ router.get('/classes', auth, async (req, res) => {
 // @route   GET /api/students/:id
 // @desc    Get student by ID
 // @access  Private
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', auth, enforceTenantScope, requireTenantAccess('Student'), async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id);
+    const filter = addTenantFilter(req, { _id: req.params.id });
+    const student = await Student.findOne(filter);
     
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });
@@ -233,6 +244,8 @@ router.get('/:id', auth, async (req, res) => {
 router.put('/:id', [
   auth,
   requireSuperAdmin,
+  enforceTenantScope,
+  requireTenantAccess('Student'),
   uploadStudentFiles
 ], handleUploadError, async (req, res) => {
   try {

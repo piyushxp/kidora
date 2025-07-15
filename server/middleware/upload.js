@@ -29,6 +29,8 @@ const localStorageConfig = () => {
         uploadPath = path.join(uploadsDir, 'profiles');
       } else if (file.fieldname === 'photos') {
         uploadPath = path.join(uploadsDir, 'gallery/photos');
+      } else if (file.fieldname === 'attachment') {
+        uploadPath = path.join(uploadsDir, 'assignments');
       }
       
       if (!fs.existsSync(uploadPath)) {
@@ -74,6 +76,9 @@ const uploadLogo = upload.single('logo');
 const uploadProfileImage = upload.single('profileImage');
 const uploadMultiplePhotos = upload.array('photos', 10); // Max 10 photos
 
+// Assignment attachment upload
+const uploadAssignmentAttachment = upload.single('attachment');
+
 // For student forms that may have multiple optional file fields
 const uploadStudentFiles = upload.fields([
   { name: 'photo', maxCount: 1 },
@@ -107,6 +112,7 @@ module.exports = {
   uploadProfileImage,
   uploadMultiplePhotos,
   uploadStudentFiles,
+  uploadAssignmentAttachment,
   handleUploadError,
   isS3Configured
 }; 

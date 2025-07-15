@@ -6,6 +6,7 @@ import {
   ArrowLeftIcon,
   PhotoIcon
 } from '@heroicons/react/24/outline';
+import http from '../utils/http';
 
 const TeacherForm = () => {
   const { id } = useParams();
@@ -17,7 +18,8 @@ const TeacherForm = () => {
     email: '',
     password: '',
     phone: '',
-    assignedClass: '',
+    bloodGroup: '',
+    // assignedClass: '',
     isActive: true
   });
   const [files, setFiles] = useState({
@@ -33,7 +35,7 @@ const TeacherForm = () => {
   const fetchTeacher = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/teachers/${id}`);
+      const response = await http.get(`/teachers/${id}`);
       const teacher = response.data;
       
       setFormData({
@@ -41,7 +43,8 @@ const TeacherForm = () => {
         email: teacher.email || '',
         password: '',
         phone: teacher.phone || '',
-        assignedClass: teacher.assignedClass || '',
+        bloodGroup: teacher.bloodGroup || '',
+        // assignedClass: teacher.assignedClass || '',
         isActive: teacher.isActive !== undefined ? teacher.isActive : true
       });
     } catch (error) {
@@ -92,10 +95,10 @@ const TeacherForm = () => {
       });
 
       if (id && id !== 'new') {
-        await axios.put(`/teachers/${id}`, submitData);
+        await http.put(`/teachers/${id}`, submitData);
         toast.success('Teacher updated successfully');
       } else {
-        await axios.post('/teachers', submitData);
+        await http.post('/teachers', submitData);
         toast.success('Teacher added successfully');
       }
 
@@ -198,17 +201,31 @@ const TeacherForm = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Assigned Class *</label>
+                <label className="block text-sm font-medium text-gray-700">Blood Group</label>
+                <select
+                  name="bloodGroup"
+                  value={formData.bloodGroup}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select</option>
+                  {['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(bg => (
+                    <option key={bg} value={bg}>{bg}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* <div>
+                <label className="block text-sm font-medium text-gray-700">Assigned Class </label>
                 <input
                   type="text"
                   name="assignedClass"
-                  required
                   value={formData.assignedClass}
                   onChange={handleChange}
                   placeholder="e.g., Nursery A, LKG B"
                   className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-              </div>
+              </div> */}
 
               <div className="sm:col-span-2">
                 <label className="flex items-center">

@@ -79,6 +79,11 @@ const studentSchema = new mongoose.Schema({
     medications: [String],
     specialNeeds: String
   },
+  bloodGroup: {
+    type: String,
+    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+    default: 'O+' // or leave undefined if not provided
+  },
   feeStructure: {
     monthlyFee: {
       type: Number,
@@ -92,6 +97,11 @@ const studentSchema = new mongoose.Schema({
       type: Number,
       default: 0
     }
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
   createdAt: {
     type: Date,

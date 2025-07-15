@@ -13,6 +13,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/LoadingSpinner';
+import http from '../utils/http';
 
 const Teachers = () => {
   const [teachers, setTeachers] = useState([]);
@@ -27,7 +28,7 @@ const Teachers = () => {
 
   const fetchTeachers = async () => {
     try {
-      const response = await axios.get('/teachers');
+      const response = await http.get('/teachers');
       setTeachers(response.data.teachers || []);
     } catch (error) {
       toast.error('Failed to fetch teachers');
@@ -42,7 +43,7 @@ const Teachers = () => {
     }
 
     try {
-      await axios.delete(`/teachers/${teacherId}`);
+      await http.delete(`/teachers/${teacherId}`);
       toast.success('Teacher deleted successfully');
       fetchTeachers();
     } catch (error) {
@@ -201,7 +202,7 @@ const Teachers = () => {
                 <thead className="table-header">
                   <tr>
                     <th className="table-header-cell">Teacher</th>
-                    <th className="table-header-cell">Assigned Class</th>
+                    {/* <th className="table-header-cell">Assigned Class</th> */}
                     <th className="table-header-cell">Contact</th>
                     <th className="table-header-cell">Status</th>
                     <th className="table-header-cell">Actions</th>
@@ -223,11 +224,11 @@ const Teachers = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="table-cell">
-                        <span className="badge badge-success">
-                          {teacher.assignedClass}
-                        </span>
-                      </td>
+                        {/* <td className="table-cell">
+                          <span className="badge badge-success">
+                            {teacher.assignedClass}
+                          </span>
+                        </td> */}
                       <td className="table-cell text-sm text-gray-900">
                         {teacher.phone}
                       </td>
@@ -248,7 +249,7 @@ const Teachers = () => {
                             <EyeIcon className="icon-sm" />
                           </Link>
                           <Link
-                            to={`/teachers/${teacher._id}/edit`}
+                            to={`/teachers/${teacher._id}`}
                             className="p-2 text-warning-600 hover:text-warning-800 hover:bg-warning-50 rounded-lg transition-colors"
                             title="Edit Teacher"
                           >

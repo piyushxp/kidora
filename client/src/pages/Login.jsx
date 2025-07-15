@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon, AcademicCapIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 
 const Login = () => {
@@ -12,6 +13,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login, brandSettings } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -26,7 +28,15 @@ const Login = () => {
 
     try {
       const result = await login(formData.email, formData.password);
-      if (!result.success) {
+      if (result.success) {
+        // Check user role and redirect
+        const user = JSON.parse(localStorage.getItem('user')) || null;
+        if (user && user.role === 'dev_admin') {
+          navigate('/dev-admin/dashboard', { replace: true });
+        } else {
+          navigate('/dashboard', { replace: true });
+        }
+      } else {
         setLoading(false);
       }
     } catch (error) {

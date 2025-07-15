@@ -10,6 +10,7 @@ import {
   PhotoIcon,
   Cog6ToothIcon,
   AcademicCapIcon,
+  DocumentTextIcon,
   Bars3Icon,
   XMarkIcon,
   BellIcon,
@@ -27,6 +28,7 @@ const Layout = () => {
     { name: 'Students', href: '/students', icon: UsersIcon, description: 'Manage Students' },
     { name: 'Teachers', href: '/teachers', icon: UserGroupIcon, description: 'Manage Teachers' },
     { name: 'Attendance', href: '/attendance', icon: CalendarIcon, description: 'Track Attendance' },
+    { name: 'Assignments', href: '/assignments', icon: DocumentTextIcon, description: 'Manage Assignments' },
     { name: 'Payments', href: '/payments', icon: CreditCardIcon, description: 'Billing & Invoices' },
     { name: 'Gallery', href: '/gallery', icon: PhotoIcon, description: 'Photo Gallery' },
     { name: 'Settings', href: '/settings', icon: Cog6ToothIcon, description: 'App Settings' },
@@ -39,6 +41,22 @@ const Layout = () => {
       href: '/classes', 
       icon: AcademicCapIcon, 
       description: 'Manage Classes' 
+    });
+  }
+
+  // Filter navigation based on accessibleModules for super_admin
+  let filteredNavigation = navigation;
+  if (user?.role === 'super_admin' && user.accessibleModules) {
+    filteredNavigation = navigation.filter(item => {
+      if (item.name === 'Dashboard' || item.name === 'Settings' || item.name === 'Payments') return true;
+      if (item.name === 'Students' && !user.accessibleModules.students) return false;
+      if (item.name === 'Teachers' && !user.accessibleModules.teachers) return false;
+      if (item.name === 'Attendance' && !user.accessibleModules.attendance) return false;
+      if (item.name === 'Gallery' && !user.accessibleModules.gallery) return false;
+      if (item.name === 'Classes' && !user.accessibleModules.classes) return false;
+      if (item.name === 'Assignments' && !user.accessibleModules.assignments) return false;
+      // Stock Management: add if you have a menu item for it
+      return true;
     });
   }
 
@@ -87,7 +105,7 @@ const Layout = () => {
           
           {/* Mobile navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto bg-white">
-            {navigation.map((item) => (
+            {filteredNavigation.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
@@ -155,7 +173,7 @@ const Layout = () => {
           
           {/* Desktop navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto bg-white">
-            {navigation.map((item) => (
+            {filteredNavigation.map((item) => (
               <a
                 key={item.name}
                 href={item.href}

@@ -19,8 +19,7 @@ const classSchema = new mongoose.Schema({
   },
   classTeacher: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
   },
   assistantTeachers: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -119,9 +118,9 @@ const classSchema = new mongoose.Schema({
   }
 });
 
-// Validate that classTeacher is actually a teacher
+// Validate that classTeacher is actually a teacher (if provided)
 classSchema.pre('save', async function(next) {
-  if (this.isModified('classTeacher')) {
+  if (this.isModified('classTeacher') && this.classTeacher) {
     const User = mongoose.model('User');
     const teacher = await User.findById(this.classTeacher);
     if (!teacher || teacher.role !== 'teacher') {

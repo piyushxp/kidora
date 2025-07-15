@@ -12,6 +12,7 @@ import {
   BookOpenIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import http from '../utils/http';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
@@ -54,7 +55,7 @@ function ClassManagement() {
         ...(filters.status && { status: filters.status })
       });
 
-      const response = await axios.get(`${API_BASE_URL}/classes?${params}`, {
+      const response = await http.get(`/classes?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -71,7 +72,7 @@ function ClassManagement() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/classes/stats`, {
+      const response = await http.get(`/classes/stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStats(response.data);
@@ -83,7 +84,7 @@ function ClassManagement() {
   const fetchAvailableTeachers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/classes/teachers/available`, {
+      const response = await http.get(`/classes/teachers/available`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAvailableTeachers(response.data.available);
@@ -95,7 +96,7 @@ function ClassManagement() {
   const handleDeleteClass = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API_BASE_URL}/classes/${selectedClass._id}`, {
+      await http.delete( `/classes/${selectedClass._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -113,7 +114,7 @@ function ClassManagement() {
   const handleAssignTeacher = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`${API_BASE_URL}/classes/${selectedClass._id}/assign-teacher`, {
+      await http.put( `/classes/${selectedClass._id}/assign-teacher`, {
         classTeacher: selectedTeacher
       }, {
         headers: { Authorization: `Bearer ${token}` }

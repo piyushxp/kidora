@@ -9,6 +9,7 @@ import {
   XMarkIcon,
   EyeIcon
 } from '@heroicons/react/24/outline';
+import http from '../utils/http';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
@@ -39,6 +40,7 @@ const StudentForm = () => {
       medications: '',
       specialNeeds: ''
     },
+    bloodGroup: '',
     feeStructure: {
       monthlyFee: '',
       transportFee: '',
@@ -89,7 +91,7 @@ const StudentForm = () => {
     try {
       setLoadingClasses(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/classes/list`, {
+      const response = await http.get( `/classes/list`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setClasses(response.data.classes || []);
@@ -105,7 +107,7 @@ const StudentForm = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/students/${id}`, {
+      const response = await http.get( `/students/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const student = response.data;
@@ -131,6 +133,7 @@ const StudentForm = () => {
           medications: student.medicalInfo?.medications?.join(', ') || '',
           specialNeeds: student.medicalInfo?.specialNeeds || ''
         },
+        bloodGroup: student.bloodGroup || '',
         feeStructure: {
           monthlyFee: student.feeStructure?.monthlyFee || '',
           transportFee: student.feeStructure?.transportFee || '',
@@ -261,12 +264,12 @@ const StudentForm = () => {
       });
 
       if (id && id !== 'new') {
-        await axios.put(`${API_BASE_URL}/students/${id}`, submitData, {
+        await http.put( `/students/${id}`, submitData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Student updated successfully');
       } else {
-        await axios.post(`${API_BASE_URL}/students`, submitData, {
+        await http.post( `/students`, submitData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Student added successfully');
@@ -476,6 +479,21 @@ const StudentForm = () => {
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="form-label">Blood Group</label>
+                <select
+                  name="bloodGroup"
+                  value={formData.bloodGroup}
+                  onChange={handleChange}
+                  className="form-select"
+                >
+                  <option value="">Select</option>
+                  {['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(bg=> (
+                    <option key={bg} value={bg}>{bg}</option>
+                  ))}
                 </select>
               </div>
 

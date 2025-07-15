@@ -3,6 +3,7 @@ const { body, validationResult } = require('express-validator');
 const Attendance = require('../models/Attendance');
 const Student = require('../models/Student');
 const { auth, requireTeacher, requireAnyRole } = require('../middleware/auth');
+const { enforceTenantScope, addTenantFilter, getTenantScope } = require('../middleware/tenant');
 
 const router = express.Router();
 
@@ -11,11 +12,12 @@ const router = express.Router();
 // @access  Private (Teachers)
 router.post('/', [
   auth,
-  requireTeacher,
-  body('date').isISO8601().withMessage('Valid date is required'),
-  body('attendanceData').isArray().withMessage('Attendance data must be an array'),
-  body('attendanceData.*.studentId').isMongoId().withMessage('Valid student ID is required'),
-  body('attendanceData.*.status').isIn(['present', 'absent', 'half_day']).withMessage('Valid status is required')
+  requireAnyRole, // Allow both super_admin and teacher
+  enforceTenantScope,
+  body('attendanceRecords').isArray().withMessage('Attendance records must be an array'),
+  body('attendanceRecords.*.student').isMongoId().withMessage('Valid student ID is required'),
+  body('attendanceRecords.*.date').isISO8601().withMessage('Valid date is required'),
+  body('attendanceRecords.*.status').isIn(['present', 'absent', 'late', 'half_day']).withMessage('Valid status is required')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -23,44 +25,47 @@ router.post('/', [
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    const { date, attendanceData } = req.body;
+    const { attendanceRecords } = req.body;
 
-    // Check if attendance already exists for this date and class
-    const existingAttendance = await Attendance.findOne({
-      date: new Date(date),
-      'student.assignedClass': req.user.assignedClass
-    });
-
-    if (existingAttendance) {
-      return res.status(400).json({ message: 'Attendance for this date and class already exists' });
+    // Get students in the teacher's class with tenant filtering
+    let studentFilter = { isActive: true };
+    if (req.user.role === 'teacher') {
+      studentFilter.assignedClass = req.user.assignedClass;
     }
-
-    // Get students in the teacher's class
-    const students = await Student.find({ 
-      assignedClass: req.user.assignedClass,
-      status: 'active'
-    });
+    // Apply tenant filter
+    studentFilter = addTenantFilter(req, studentFilter);
+    const students = await Student.find(studentFilter);
 
     if (students.length === 0) {
       return res.status(400).json({ message: 'No active students found in your class' });
     }
 
-    // Create attendance records
-    const attendanceRecords = attendanceData.map(record => ({
-      student: record.studentId,
-      date: new Date(date),
+    // Create attendance records with tenant scope
+    const tenantScope = getTenantScope(req.user);
+    const attendanceDocs = attendanceRecords.map(record => ({
+      student: record.student,
+      date: new Date(record.date),
       status: record.status,
+      markedBy: req.user._id,
       remarks: record.remarks || '',
       timeIn: record.timeIn ? new Date(record.timeIn) : undefined,
       timeOut: record.timeOut ? new Date(record.timeOut) : undefined,
-      markedBy: req.user._id
+      createdBy: tenantScope || req.user._id // Add tenant scope
     }));
 
-    await Attendance.insertMany(attendanceRecords);
+    // Upsert each attendance record (insert if not exists, otherwise update)
+    const bulkOps = attendanceDocs.map(doc => ({
+      updateOne: {
+        filter: { student: doc.student, date: doc.date },
+        update: { $set: doc },
+        upsert: true
+      }
+    }));
+    await Attendance.bulkWrite(bulkOps);
 
     res.status(201).json({
       message: 'Attendance marked successfully',
-      count: attendanceRecords.length
+      count: attendanceDocs.length
     });
   } catch (error) {
     console.error('Mark attendance error:', error);
