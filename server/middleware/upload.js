@@ -1,7 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { s3Upload } = require('../config/s3');
+const { s3Upload, createTenantS3Upload } = require('../config/s3');
 
 // Check if S3 is configured
 const isS3Configured = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY;
@@ -61,13 +61,13 @@ const fileFilter = (req, file, cb) => {
 };
 
 // Configure multer based on environment
-const upload = isS3Configured ? s3Upload : multer({
-  storage: localStorageConfig(),
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  },
-  fileFilter: fileFilter
-});
+const upload = isS3Configured
+  ? createTenantS3Upload('misc')
+  : multer({
+      storage: localStorageConfig(),
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: fileFilter
+    });
 
 // Specific upload configurations
 const uploadPhoto = upload.single('photo');
@@ -75,6 +75,15 @@ const uploadDocument = upload.single('document');
 const uploadLogo = upload.single('logo');
 const uploadProfileImage = upload.single('profileImage');
 const uploadMultiplePhotos = upload.array('photos', 10); // Max 10 photos
+
+// Tenant-aware gallery upload for S3
+const uploadMultipleGalleryPhotos = isS3Configured
+  ? createTenantS3Upload('gallery').array('photos', 10)
+  : multer({
+      storage: localStorageConfig(),
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: fileFilter
+    }).array('photos', 10);
 
 // Assignment attachment upload
 const uploadAssignmentAttachment = upload.single('attachment');
@@ -111,6 +120,7 @@ module.exports = {
   uploadLogo,
   uploadProfileImage,
   uploadMultiplePhotos,
+  uploadMultipleGalleryPhotos,
   uploadStudentFiles,
   uploadAssignmentAttachment,
   handleUploadError,

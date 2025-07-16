@@ -3,7 +3,8 @@ const { body, validationResult } = require('express-validator');
 const GalleryImage = require('../models/GalleryImage');
 const Class = require('../models/Class');
 const { auth, requireAnyRole } = require('../middleware/auth');
-const { uploadMultiplePhotos, handleUploadError, isS3Configured } = require('../middleware/upload');
+const { uploadMultipleGalleryPhotos, handleUploadError, isS3Configured } = require('../middleware/upload');
+const { getTenantIdFromUser } = require('../config/s3');
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ const getFileUrl = (file) => {
 // @access  Private
 router.post('/upload', [
   auth,
-  uploadMultiplePhotos,
+  uploadMultipleGalleryPhotos,
   body('title').notEmpty().withMessage('Title is required'),
   body('caption').optional().trim()
 ], handleUploadError, async (req, res) => {
@@ -72,12 +73,14 @@ router.post('/upload', [
     // Create gallery records for each uploaded file
     for (const file of req.files) {
       const imageUrl = getFileUrl(file);
+      const createdBy = getTenantIdFromUser(req.user);
 
       const galleryImage = new GalleryImage({
         title: req.files.length === 1 ? title : `${title} - ${file.originalname}`,
         caption: caption || '',
         imageUrl,
         uploadedBy: req.user._id,
+        createdBy,
         classTags: parsedClassTags
       });
 
@@ -117,6 +120,10 @@ router.get('/search', auth, async (req, res) => {
 
     const skip = (page - 1) * limit;
     let query = {};
+
+    // Filter by tenant
+    const tenantId = getTenantIdFromUser(req.user);
+    query.createdBy = tenantId;
 
     // Build search query
     if (classId) {
@@ -168,6 +175,10 @@ router.get('/', auth, async (req, res) => {
 
     const skip = (page - 1) * limit;
     let query = {};
+
+    // Filter by tenant
+    const tenantId = getTenantIdFromUser(req.user);
+    query.createdBy = tenantId;
 
     // Text search in title and caption
     if (search) {

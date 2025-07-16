@@ -13,7 +13,7 @@ import {
   ChartBarIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Dashboard = () => {
@@ -28,6 +28,11 @@ const Dashboard = () => {
   const [recentStudents, setRecentStudents] = useState([]);
   const [recentAttendance, setRecentAttendance] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Redirect dev_admin users away from dashboard
+  if (user?.role === 'dev_admin') {
+    return <Navigate to="/dev-admin/dashboard" replace />;
+  }
 
   useEffect(() => {
     const fetchDashboardData = async () => {
