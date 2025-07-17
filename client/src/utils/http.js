@@ -3,7 +3,7 @@ import { getApiConfig } from '../config/api';
 
 // Create axios instance with base configuration
 const http = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: 'https://kidora.onrender.com/api',
   // timeout: getApiConfig().timeout,
   headers: {
     'Content-Type': 'application/json',
