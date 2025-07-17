@@ -15,7 +15,7 @@ JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 # Server Configuration
 PORT=5000
 NODE_ENV=development
-
+    
 # Email Configuration (Nodemailer)
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
