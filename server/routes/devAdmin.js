@@ -30,11 +30,11 @@ router.post('/create-super-admin', auth, devAdminOnly, async (req, res) => {
     if (existing) {
       return res.status(400).json({ message: 'Email already in use.' });
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // const hashedPassword = await bcrypt.hash(password, 10);
     const superAdmin = new User({
       name,
       email,
-      password: hashedPassword,
+      password: password,
       role: 'super_admin',
       phone,
       schoolName,
