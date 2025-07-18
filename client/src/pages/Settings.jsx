@@ -127,7 +127,7 @@ const Settings = () => {
       await http.put('/branding/settings', formData);
       toast.success('Brand settings updated successfully');
       // Refresh the page to apply new settings
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       toast.error('Failed to update brand settings');
     } finally {

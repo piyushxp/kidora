@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
   HomeIcon,
@@ -87,11 +87,19 @@ const Layout = () => {
                 <HomeIcon className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-white">
+                <h1
+                  className="text-lg font-semibold"
+                  style={{ color: brandSettings?.primaryColor }}
+                >
                   {brandSettings?.schoolName || null}
                 </h1>
                 {brandSettings?.tagline && (
-                  <p className="text-xs text-white/80">{brandSettings.tagline}</p>
+                  <p
+                    className="text-xs"
+                    style={{ color: brandSettings?.secondaryColor }}
+                  >
+                    {brandSettings.tagline}
+                  </p>
                 )}
               </div>
             </div>
@@ -106,9 +114,9 @@ const Layout = () => {
           {/* Mobile navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto bg-white">
             {filteredNavigation.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className={`group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                   isActive(item.href)
                     ? 'nav-link-active bg-primary-50 text-primary-700 shadow-sm'
@@ -124,7 +132,7 @@ const Layout = () => {
                 {isActive(item.href) && (
                   <ChevronRightIcon className="icon-xs text-primary-500" />
                 )}
-              </a>
+              </Link>
             ))}
           </nav>
           
@@ -161,11 +169,19 @@ const Layout = () => {
                 <HomeIcon className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-white">
+                <h1
+                  className="text-lg font-semibold"
+                  style={{ color: brandSettings?.primaryColor }}
+                >
                   {brandSettings?.schoolName || 'Playschool Manager'}
                 </h1>
                 {brandSettings?.tagline && (
-                  <p className="text-xs text-white/80">{brandSettings.tagline}</p>
+                  <p
+                    className="text-xs"
+                    style={{ color: brandSettings?.secondaryColor }}
+                  >
+                    {brandSettings.tagline}
+                  </p>
                 )}
               </div>
             </div>
@@ -174,9 +190,9 @@ const Layout = () => {
           {/* Desktop navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto bg-white">
             {filteredNavigation.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className={`group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                   isActive(item.href)
                     ? 'nav-link-active bg-primary-50 text-primary-700 shadow-sm'
@@ -191,7 +207,7 @@ const Layout = () => {
                 {isActive(item.href) && (
                   <ChevronRightIcon className="icon-xs text-primary-500" />
                 )}
-              </a>
+              </Link>
             ))}
           </nav>
           
