@@ -19,11 +19,11 @@ const getFileUrl = (file) => {
 };
 
 // @route   POST /api/students
-// @desc    Add new student (Super Admin only)
-// @access  Private (Super Admin)
+// @desc    Add new student (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
 router.post('/', [
   auth,
-  requireSuperAdmin,
+  requireAnyRole,
   enforceTenantScope,
   uploadStudentFiles,
   body('name').notEmpty().withMessage('Student name is required'),
@@ -239,11 +239,11 @@ router.get('/:id', auth, enforceTenantScope, requireTenantAccess('Student'), asy
 });
 
 // @route   PUT /api/students/:id
-// @desc    Update student (Super Admin only)
-// @access  Private (Super Admin)
+// @desc    Update student (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
 router.put('/:id', [
   auth,
-  requireSuperAdmin,
+  requireAnyRole,
   enforceTenantScope,
   requireTenantAccess('Student'),
   uploadStudentFiles
@@ -342,9 +342,9 @@ router.put('/:id', [
 });
 
 // @route   PUT /api/students/:id/status
-// @desc    Toggle student active status (Super Admin only)
-// @access  Private (Super Admin)
-router.put('/:id/status', [auth, requireSuperAdmin], async (req, res) => {
+// @desc    Toggle student active status (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
+router.put('/:id/status', [auth, requireAnyRole], async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
     
@@ -366,11 +366,11 @@ router.put('/:id/status', [auth, requireSuperAdmin], async (req, res) => {
 });
 
 // @route   POST /api/students/:id/documents
-// @desc    Upload student documents (Super Admin only)
-// @access  Private (Super Admin)
+// @desc    Upload student documents (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
 router.post('/:id/documents', [
   auth,
-  requireSuperAdmin,
+  requireAnyRole,
   uploadDocument
 ], handleUploadError, async (req, res) => {
   try {
@@ -407,9 +407,9 @@ router.post('/:id/documents', [
 });
 
 // @route   DELETE /api/students/:id
-// @desc    Deactivate student (instead of deleting) (Super Admin only)
-// @access  Private (Super Admin)
-router.delete('/:id', [auth, requireSuperAdmin], async (req, res) => {
+// @desc    Deactivate student (instead of deleting) (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
+router.delete('/:id', [auth, requireAnyRole], async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
     

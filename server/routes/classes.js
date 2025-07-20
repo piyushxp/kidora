@@ -3,7 +3,7 @@ const { body, validationResult } = require('express-validator');
 const Class = require('../models/Class');
 const User = require('../models/User');
 const Student = require('../models/Student');
-const { auth, requireSuperAdmin } = require('../middleware/auth');
+const { auth, requireSuperAdmin, requireAnyRole } = require('../middleware/auth');
 const { enforceTenantScope, addTenantFilter, getTenantScope, requireTenantAccess } = require('../middleware/tenant');
 
 const router = express.Router();
@@ -29,9 +29,9 @@ router.get('/list', [auth, enforceTenantScope], async (req, res) => {
 });
 
 // @route   GET /api/classes
-// @desc    Get all classes (Super Admin only)
-// @access  Private (Super Admin)
-router.get('/', [auth, requireSuperAdmin, enforceTenantScope], async (req, res) => {
+// @desc    Get all classes (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
+router.get('/', [auth, requireAnyRole, enforceTenantScope], async (req, res) => {
   try {
     const { page = 1, limit = 10, academicYear, status } = req.query;
     const skip = (page - 1) * limit;
@@ -95,11 +95,11 @@ router.get('/', [auth, requireSuperAdmin, enforceTenantScope], async (req, res) 
 });
 
 // @route   POST /api/classes
-// @desc    Create new class (Super Admin only)
-// @access  Private (Super Admin)
+// @desc    Create new class (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
 router.post('/', [
   auth,
-  requireSuperAdmin,
+  requireAnyRole,
   enforceTenantScope,
   body('name').notEmpty().withMessage('Class name is required'),
   body('capacity').isInt({ min: 1, max: 50 }).withMessage('Capacity must be between 1 and 50'),
@@ -204,9 +204,9 @@ router.post('/', [
 });
 
 // @route   GET /api/classes/:id
-// @desc    Get class by ID (Super Admin only)
-// @access  Private (Super Admin)
-router.get('/:id', [auth, requireSuperAdmin, enforceTenantScope, requireTenantAccess('Class')], async (req, res) => {
+// @desc    Get class by ID (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
+router.get('/:id', [auth, requireAnyRole, enforceTenantScope, requireTenantAccess('Class')], async (req, res) => {
   try {
     const filter = addTenantFilter(req, { _id: req.params.id });
     const classItem = await Class.findOne(filter)
@@ -242,11 +242,11 @@ router.get('/:id', [auth, requireSuperAdmin, enforceTenantScope, requireTenantAc
 });
 
 // @route   PUT /api/classes/:id
-// @desc    Update class (Super Admin only)
-// @access  Private (Super Admin)
+// @desc    Update class (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
 router.put('/:id', [
   auth,
-  requireSuperAdmin,
+  requireAnyRole,
   enforceTenantScope,
   requireTenantAccess('Class'),
   body('name').optional().notEmpty().withMessage('Class name cannot be empty'),
@@ -370,9 +370,9 @@ router.put('/:id', [
 });
 
 // @route   DELETE /api/classes/:id
-// @desc    Delete class (Super Admin only)
-// @access  Private (Super Admin)
-router.delete('/:id', [auth, requireSuperAdmin, enforceTenantScope, requireTenantAccess('Class')], async (req, res) => {
+// @desc    Delete class (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
+router.delete('/:id', [auth, requireAnyRole, enforceTenantScope, requireTenantAccess('Class')], async (req, res) => {
   try {
     const filter = addTenantFilter(req, { _id: req.params.id });
     const classItem = await Class.findOne(filter);
@@ -408,11 +408,11 @@ router.delete('/:id', [auth, requireSuperAdmin, enforceTenantScope, requireTenan
 });
 
 // @route   PUT /api/classes/:id/assign-teacher
-// @desc    Assign or change class teacher (Super Admin only)
-// @access  Private (Super Admin)
+// @desc    Assign or change class teacher (Super Admin and Teacher)
+// @access  Private (Super Admin and Teacher)
 router.put('/:id/assign-teacher', [
   auth,
-  requireSuperAdmin,
+  requireAnyRole,
   enforceTenantScope,
   requireTenantAccess('Class'),
   body('classTeacher').isMongoId().withMessage('Valid teacher ID is required')
